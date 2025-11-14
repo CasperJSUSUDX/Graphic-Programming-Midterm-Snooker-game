@@ -173,32 +173,32 @@ function setup() {
         parts: [
             // top
             Bodies.rectangle(
-                window.innerWidth / 2,
-                window.innerHeight / 2 - tableWidth / 2 - ballSize / 2,
+                0,
+                -tableWidth / 2 - ballSize / 2,
                 tableLength,
                 ballSize,
                 tableOptions
             ),
             // left
             Bodies.rectangle(
-                window.innerWidth / 2 - tableLength / 2 - ballSize / 2,
-                window.innerHeight / 2,
+                -tableLength / 2 - ballSize / 2,
+                0,
                 ballSize,
                 tableWidth,
                 tableOptions
             ),
             // bottom
             Bodies.rectangle(
-                window.innerWidth / 2,
-                window.innerHeight / 2 + tableWidth / 2 + ballSize / 2,
+                0,
+                tableWidth / 2 + ballSize / 2,
                 tableLength,
                 ballSize,
                 tableOptions
             ),
             // right
             Bodies.rectangle(
-                window.innerWidth / 2 + tableLength / 2 + ballSize / 2,
-                window.innerHeight / 2,
+                tableLength / 2 + ballSize / 2,
+                0,
                 ballSize,
                 tableWidth,
                 tableOptions
@@ -209,16 +209,22 @@ function setup() {
     });
     // cue
     cue = Bodies.rectangle(
-        window.innerWidth / 2,
-        window.innerHeight / 2 - tableWidth / 4,
+        0,
+        -tableWidth / 4,
         cueLength,
         cueDiameter,
         cueOptions
     );
 
     // add bodies to world
-    // World.add(world, [tableSides, cue]);
-    World.add(world, tableSides);
+    World.add(world, [tableSides, cue]);
+
+    // translate the world to the center of user window
+    Composite.translate(world,
+        {
+            x: window.innerWidth / 2,
+            y: window.innerHeight / 2
+        });
 }
 
 function draw() {
@@ -325,8 +331,8 @@ function draw() {
         speed.mult(cueMoveSpeed);
         cuePosition.add(speed);
         Body.setPosition(cue, {
-            x: window.innerWidth / 2 + cuePosition.x,
-            y: window.innerHeight / 2 + cuePosition.y,
+            x: cuePosition.x,
+            y: cuePosition.y,
         });
     }
 
@@ -348,8 +354,8 @@ function draw() {
         for (let j = 0; j < pocketsPos.length; j++) {
             if (
                 dist(
-                    -window.innerWidth / 2 + balls[i].info().position.x,
-                    -window.innerHeight / 2 + balls[i].info().position.y,
+                    balls[i].info().position.x,
+                    balls[i].info().position.y,
                     pocketsPos[j].x,
                     pocketsPos[j].y
                 ) < pocketSize
@@ -385,12 +391,7 @@ function draw() {
     pop();
 
     // mouse position
-    push();
-    strokeWeight(0.4);
-    stroke(255);
-    fill(255);
-    text(`${mouseX}, ${mouseY}`, mouseX, mouseY);
-    pop();
+    drawMousePos();
 }
 
 function mousePressed() {
@@ -471,10 +472,6 @@ async function mouseReleased() {
             }
         );
         World.add(world, cueSensor);
-        Body.translate(cue, {
-            x: innerWidth / 2,
-            y: innerHeight / 2,
-        });
         for (let i = 0; i < balls.length; i++) {
             // BUG(Casper): Cue sensor cannot detect balls
             console.log(Collision.collides(balls[i].info(), cueSensor));
@@ -583,33 +580,4 @@ async function cueReposition(direction) {
 
         step();
     });
-}
-
-class Ball {
-    constructor(defaultPosition, color, score = 1, size = ballSize) {
-        this.id = color;
-        this.score = score;
-        let ball = Bodies.circle(
-            window.innerWidth / 2 + defaultPosition.x,
-            window.innerHeight / 2 + defaultPosition.y,
-            size / 2,
-            ballOptions
-        );
-        World.add(world, ball);
-
-        this.draw = function () {
-            push();
-            translate(ball.position.x, ball.position.y);
-            rotate(ball.angle);
-            stroke(0);
-            strokeWeight(0.5);
-            fill(color);
-            ellipse(0, 0, size);
-            pop();
-        };
-
-        this.info = function () {
-            return ball;
-        };
-    }
 }
