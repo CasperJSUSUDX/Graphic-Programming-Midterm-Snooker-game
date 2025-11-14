@@ -1,4 +1,4 @@
-const { Engine, Body, Bodies, World, Composite, Render, Runner, Collision } =
+const { Engine, Body, Bodies, World, Composite, Render, Runner, Collision, Events } =
     Matter;
 
 var engine;

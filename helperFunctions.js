@@ -8,6 +8,7 @@ class Ball {
             size / 2,
             ballOptions
         );
+        this.position = ball.position;
         World.add(world, ball);
 
         this.draw = function () {
@@ -21,9 +22,24 @@ class Ball {
             pop();
         };
 
+        // return the ball's object
         this.info = function () {
             return ball;
         };
+
+        /**
+         * apply
+         * @param {*} cue 
+         * @param {*} power 
+         */
+        this.collision = function (cue, power) {
+            let force = {
+                x: cos(cue.angle) * power,
+                y: sin(cue.angle) * power
+            }
+
+            Body.applyForce(ball, this.position, force);
+        }
     }
 }
 

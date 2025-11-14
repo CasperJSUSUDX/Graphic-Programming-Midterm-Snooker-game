@@ -54,6 +54,7 @@ const cueLength = (tableWidth * 5) / 6;
 const cueDiameter = tableWidth * 0.014;
 const cueColor = "#563112";
 var cue;
+var cueSensor;
 var cueMoveSpeed = 10;
 var cuePosition;
 var originalCuePos;
@@ -166,7 +167,6 @@ function setup() {
     scoreUI.class("ui-text");
     scoreUI.parent("ui");
 
-    // TODO(Casper): Using Body.translate to change the initial position of  bodies
     // bodise initial
     // table
     tableSides = Body.create({
@@ -330,9 +330,9 @@ function draw() {
         speed.normalize();
         speed.mult(cueMoveSpeed);
         cuePosition.add(speed);
-        Body.setPosition(cue, {
-            x: cuePosition.x,
-            y: cuePosition.y,
+        Body.translate(cue, {
+            x: speed.x,
+            y: speed.y,
         });
     }
 
@@ -370,7 +370,7 @@ function draw() {
         }
     }
 
-    // select object ball area
+    // select object ball
     push();
     for (let i = 0; i < colorOrder.length; i++) {
         let color = colorOrder[i];
@@ -398,8 +398,27 @@ function mousePressed() {
     // start deciding push force
     if (!pushing && positionLock) {
         pushing = true;
+        rotationLock = true;
         pushStartPos = createVector(mouseX, mouseY);
         originalCuePos = cuePosition.copy();
+
+        cueSensor = Bodies.rectangle(
+            cue.position.x,
+            cue.position.y,
+            cueLength,
+            cueDiameter,
+            {
+                isSensor: true,
+                collisionFilter: {
+                    category: SCENE,
+                    mask: SCENE,
+                },
+            }
+        )
+
+        console.log(cueSensor.position)
+        // create a sensor for cue
+        World.add(world, cueSensor);
     }
 
     // select color
@@ -427,6 +446,10 @@ function mouseDragged() {
     if (pushing && positionLock) {
         // reset cue position
         cuePosition = originalCuePos.copy();
+        Body.setPosition(cueSensor, {
+            x: window.innerWidth / 2 + cuePosition.x,
+            y: window.innerHeight / 2 + cuePosition.y
+        });
 
         // calulate cue's moving and store cue position
         originalCuePos = cuePosition.copy();
@@ -438,6 +461,23 @@ function mouseDragged() {
         ).mult(moveLength);
 
         cuePosition.sub(moveDirection);
+        Body.translate(cueSensor, {
+            x: -moveDirection.x,
+            y: -moveDirection.y
+        });
+        
+        // console.log(`Cue sensor position: x:${cueSensor.position.x}, y:${cueSensor.position.y}\nBlue ball position: x: ${balls[4].position.x}, y: ${balls[4].position.y}`);
+
+        // TODO(Casper): Fix bug that cue sensor detect balls in wrong position
+        // check if cue collision with any ball
+        for (let i = 0; i < balls.length; i++) {
+            // BUG(Casper): Cue sensor cannot detect balls
+            let outcome = Collision.collides(balls[i].info(), cueSensor);
+            if (outcome) {
+                console.log("Detected collision with ball:", i);
+                console.log(`Cue sensor position: x:${cueSensor.position.x}, y:${cueSensor.position.y}\nBlue ball position: x: ${balls[4].position.x}, y: ${balls[4].position.y}`);
+            };
+        }
     }
 }
 
@@ -458,23 +498,8 @@ async function mouseReleased() {
         ).div(pushForce);
         await cueReposition(speed);
         // after animation apply velocity to cue's body
-        let cueSensor = Bodies.rectangle(
-            cuePosition.x,
-            cuePosition.y,
-            cueLength + ballSize / 2,
-            cueDiameter,
-            {
-                isSensor: true,
-                collisionFilter: {
-                    category: SCENE,
-                    mask: SCENE,
-                },
-            }
-        );
-        World.add(world, cueSensor);
         for (let i = 0; i < balls.length; i++) {
-            // BUG(Casper): Cue sensor cannot detect balls
-            console.log(Collision.collides(balls[i].info(), cueSensor));
+            // console.log(Collision.collides(balls[i].info(), cueSensor));
         }
 
         Body.applyForce(cue, cue.position, {
@@ -483,13 +508,14 @@ async function mouseReleased() {
         });
         console.log(`Apply velocity: ${pushForce}`);
         World.remove(world, cueSensor);
+        Events.off(engine, "collisionStart");
 
-        // change state
-        // pushing = false;
-        // positionLock = false;
-        // rotationLock = false;
-        // cue.collisionFilter.category = PLAYER;
-        // cue.collisionFilter.mask = PLAYER;
+        // back to default state
+        pushing = false;
+        positionLock = false;
+        cue.collisionFilter.category = PLAYER;
+        cue.collisionFilter.mask = PLAYER;
+        setTimeout(() => {rotationLock = false;}, 100);
     }
 }
 
@@ -498,11 +524,11 @@ function keyPressed() {
         if (positionLock) {
             cue.collisionFilter.category = PLAYER;
             cue.collisionFilter.mask = PLAYER;
-            rotationLock = false;
+            // rotationLock = false;
         } else {
             cue.collisionFilter.category = SCENE;
             cue.collisionFilter.mask = SCENE;
-            rotationLock = true;
+            // rotationLock = true;
         }
 
         positionLock = !positionLock;
