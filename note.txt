@@ -1,0 +1,5 @@
+Choose object ball
+if havn't pocket red ball
+then can only choose red ball
+if last shot sink red ball
+then lock red and can choose others
