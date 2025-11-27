@@ -578,10 +578,7 @@ function layoutOfSnookerBalls() {
         for (let j = 0; j <= i; j++) {
             balls.push(
                 new Ball(
-                    createVector(
-                        tableLength / 4 + ballSize * (i + 1),
-                        basicPosY - ballSize * j
-                    ),
+                    { x: tableLength / 4 + ballSize * (i + 1), y: basicPosY - ballSize * j },
                     "#ff0000"
                 )
             );
