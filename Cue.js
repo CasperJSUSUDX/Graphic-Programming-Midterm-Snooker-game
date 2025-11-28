@@ -49,9 +49,6 @@ class Cue {
         World.add(world, this.body);
         this.sensor;
 
-        // debug var
-        this.de_position = position;
-
         this.draw = function () {
             push();
             translate(window.innerWidth / 2, window.innerHeight / 2);
