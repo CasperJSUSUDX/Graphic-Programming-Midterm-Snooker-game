@@ -415,8 +415,8 @@ function mousePressed() {
                 },
             }
         )
+        Body.setAngle(cueSensor, cueRotateDeg);
 
-        console.log(cueSensor.position)
         // create a sensor for cue
         World.add(world, cueSensor);
     }
@@ -465,17 +465,13 @@ function mouseDragged() {
             x: -moveDirection.x,
             y: -moveDirection.y
         });
-        
-        // console.log(`Cue sensor position: x:${cueSensor.position.x}, y:${cueSensor.position.y}\nBlue ball position: x: ${balls[4].position.x}, y: ${balls[4].position.y}`);
 
-        // TODO(Casper): Fix bug that cue sensor detect balls in wrong position
         // check if cue collision with any ball
         for (let i = 0; i < balls.length; i++) {
             // BUG(Casper): Cue sensor cannot detect balls
             let outcome = Collision.collides(balls[i].info(), cueSensor);
             if (outcome) {
                 console.log("Detected collision with ball:", i);
-                console.log(`Cue sensor position: x:${cueSensor.position.x}, y:${cueSensor.position.y}\nBlue ball position: x: ${balls[4].position.x}, y: ${balls[4].position.y}`);
             };
         }
     }
@@ -490,7 +486,7 @@ async function mouseReleased() {
         pushForce = map(moveLength, 0, 300, 0, 10);
 
         // apply pushing animation
-        console.log("Apply push animation");
+        console.log("Cue released: Apply push animation");
         // cuePosition = originalCuePos.copy();
         let speed = createVector(
             originalCuePos.x - cuePosition.x,
@@ -498,15 +494,12 @@ async function mouseReleased() {
         ).div(pushForce);
         await cueReposition(speed);
         // after animation apply velocity to cue's body
-        for (let i = 0; i < balls.length; i++) {
-            // console.log(Collision.collides(balls[i].info(), cueSensor));
-        }
 
         Body.applyForce(cue, cue.position, {
             x: cos(cueRotateDeg) * pushForce * 0.1,
             y: sin(cueRotateDeg) * pushForce * 0.1,
         });
-        console.log(`Apply velocity: ${pushForce}`);
+        console.log(`Cue released: Apply velocity: ${pushForce}`);
         World.remove(world, cueSensor);
         Events.off(engine, "collisionStart");
 
