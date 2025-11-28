@@ -7,7 +7,7 @@ class Cue {
      * @param {Number} _speed 
      * @param {Number} _pushForce 
      */
-    constructor (_initPos, _length, _diameter, _color, _speed, _pushForce) {
+    constructor (_initPos, _length, _diameter, _color, _speed, _pushForce, _hitSupportRange) {
         const bodyOptions = {
             isStatic: true,
             density: 0.06,
@@ -33,21 +33,24 @@ class Cue {
         var color = _color;
         var speed = _speed;
         var pushForce = _pushForce;
+        var hitSupportRange = _hitSupportRange;
         var pushing = false;
+        var hitWhenPushing = false;
         var positionLock = false;
         var rotationLock = false;
         var originalBodyPos;
         var pushStartPos;
 
-        this.body = Bodies.rectangle(
+        var body = Bodies.rectangle(
             position.x,
             position.y,
             length,
             diameter,
             bodyOptions
         );
-        World.add(world, this.body);
-        this.sensor;
+        World.add(world, body);
+        var collisionSensor;
+        var hitSensor;
 
         this.draw = function () {
             push();
@@ -75,7 +78,7 @@ class Cue {
 
                 velocity.normalize().mult(speed);
                 position.add(velocity);
-                Body.translate(this.body, {
+                Body.translate(body, {
                     x: velocity.x,
                     y: velocity.y,
                 });
@@ -93,23 +96,27 @@ class Cue {
             }
 
             // TODO(Casper): Switch to useing angular speed to spin cue instead of useing "setAngle"
-            Body.setAngle(this.body, deg);
+            Body.setAngle(body, deg);
         }
 
         this.switchMode = function () {
             if (!pushing) {
                 if (positionLock) {
-                    this.body.collisionFilter.category = PLAYER;
-                    this.body.collisionFilter.mask = PLAYER;
+                    body.collisionFilter.category = PLAYER;
+                    body.collisionFilter.mask = PLAYER;
                     // rotationLock = false;
                 } else {
-                    this.body.collisionFilter.category = SCENE;
-                    this.body.collisionFilter.mask = SCENE;
+                    body.collisionFilter.category = SCENE;
+                    body.collisionFilter.mask = SCENE;
                     // rotationLock = true;
                 }
 
                 positionLock = !positionLock;
             }
+        }
+
+        this.adjustSpeed = function (num) {
+            speed = num;
         }
 
         this.pushStart = function () {
@@ -119,23 +126,31 @@ class Cue {
                 pushStartPos = createVector(mouseX, mouseY);
                 originalBodyPos = position.copy();
 
-                this.sensor = Bodies.rectangle(
-                    this.body.position.x,
-                    this.body.position.y,
+                collisionSensor = Bodies.rectangle(
+                    body.position.x,
+                    body.position.y,
                     length,
                     diameter,
                     sensorOptions
                 );
-                Body.setAngle(this.sensor, deg);
-                World.add(world, this.sensor);
+                hitSensor = Bodies.rectangle(
+                    body.position.x + (cos(deg) * (length / 2 + hitSupportRange / 2)),
+                    body.position.y + (sin(deg) * (length / 2 + hitSupportRange / 2)),
+                    hitSupportRange,
+                    hitSupportRange,
+                    sensorOptions
+                );
+                Body.setAngle(collisionSensor, deg);
+                Body.setAngle(hitSensor, deg);
+                World.add(world, [collisionSensor, hitSensor]);
             }
         }
 
         this.pushProcess = function () {
-            if (pushing && positionLock) {
+            if (pushing && positionLock && !hitWhenPushing) {
                 // reset cue position
                 position = originalBodyPos.copy();
-                Body.setPosition(this.sensor, {
+                Body.setPosition(collisionSensor, {
                     x: window.innerWidth / 2 + position.x,
                     y: window.innerHeight / 2 + position.y
                 });
@@ -150,16 +165,24 @@ class Cue {
                 ).mult(moveLength);
 
                 position.sub(moveDirection);
-                Body.translate(this.sensor, {
+                Body.translate(collisionSensor, {
                     x: -moveDirection.x,
                     y: -moveDirection.y
                 });
 
-                // check if cue collision with any ball
+                // hit ball during pushing
                 for (let i = 0; i < balls.length; i++) {
-                    const outcome = Collision.collides(balls[i].info(), this.sensor);
-                    if (outcome) {
+                    if (Collision.collides(balls[i].body, collisionSensor)) {
                         console.log("Detected collision with ball:", i);
+                        hitWhenPushing = true;
+                        // case 1: Hit white ball
+                        if (i === 0) {
+
+                        }
+                        // case 2: Hit color balls
+                        else {
+                            
+                        }
                     };
                 }
             }
@@ -190,25 +213,28 @@ class Cue {
                 pushForce = map(moveLength, 0, 300, 0, 10);
 
                 // apply pushing animation
-                console.log("Cue released: Apply push animation");
                 const speed = createVector(
                     originalBodyPos.x - position.x,
                     originalBodyPos.y - position.y
                 ).div(pushForce);
                 await cueReposition(speed);
-                // Body.applyForce(this.body, this.body.position, {
-                //     x: cos(cueRotateDeg) * pushForce * 0.1,
-                //     y: sin(cueRotateDeg) * pushForce * 0.1,
-                // });
-                console.log(`Cue released: Apply velocity: ${pushForce}`);
-                World.remove(world, this.sensor);
-                Events.off(engine, "collisionStart");
+                for (let i = 0; i < balls.length; i++) {
+                    if (Collision.collides(balls[i].body, hitSensor)) {
+                        Body.applyForce(balls[i].body, balls[i].body.position, {
+                                x: cos(deg) * pushForce * 0.1,
+                                y: sin(deg) * pushForce * 0.1,
+                            });
+                        break;
+                    }
+                }
+                World.remove(world, collisionSensor);
 
                 // back to default state
                 pushing = false;
                 positionLock = false;
-                this.body.collisionFilter.category = PLAYER;
-                this.body.collisionFilter.mask = PLAYER;
+                hitWhenPushing = false;
+                body.collisionFilter.category = PLAYER;
+                body.collisionFilter.mask = PLAYER;
                 setTimeout(() => {rotationLock = false;}, 100);
             }
         }

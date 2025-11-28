@@ -53,18 +53,6 @@ const tableFriction = 0.1;
 var cue;
 // balls
 var balls = [];
-const ballOptions = {
-    ccd: true,
-    density: 0.04,
-    restitution: 0.8,
-    friction: 0.1,
-    frictionAir: 0.01,
-    label: "Ball",
-    collisionFilter: {
-        category: SCENE,
-        mask: SCENE,
-    },
-};
 var colorOrder = [
     "#ff0000",
     "#ffff00",
@@ -134,7 +122,7 @@ function setup() {
     currentSensetiveText.parent("ui-move");
     moveSlider.changed(() => {
         currentSensetiveText.html(moveSlider.value());
-        cueMoveSpeed = moveSlider.value();
+        cue.adjustSpeed(moveSlider.value());
     });
     // score
     scoreUI = createSpan(`Score: ${score}`);
@@ -188,7 +176,8 @@ function setup() {
             tableWidth * 0.014,
             "#563112",
             10,
-            2
+            2,
+            ballSize / 2
         );
 
     // add bodies to world
@@ -281,14 +270,14 @@ function draw() {
         for (let j = 0; j < pocketsPos.length; j++) {
             if (
                 dist(
-                    balls[i].info().position.x,
-                    balls[i].info().position.y,
+                    balls[i].body.position.x,
+                    balls[i].body.position.y,
                     pocketsPos[j].x,
                     pocketsPos[j].y
                 ) < pocketSize
             ) {
                 console.log("drop");
-                World.remove(world, balls[i].info());
+                World.remove(world, balls[i].body);
                 score += balls[i].score;
                 scoreUI.html(`Score: ${score}`);
                 balls.splice(i, 1);
