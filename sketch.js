@@ -50,33 +50,7 @@ const tableOptions = {
 const tableRestitution = 0.7;
 const tableFriction = 0.1;
 // cue
-const cueLength = (tableWidth * 5) / 6;
-const cueDiameter = tableWidth * 0.014;
-const cueColor = "#563112";
 var cue;
-var cueSensor;
-var cueMoveSpeed = 10;
-var cuePosition;
-var originalCuePos;
-var cueRotateDeg = 0;
-var preCueRotateDeg = 0;
-var pushStartPos;
-var pushForce = 2;
-var pushing = false;
-var positionLock = false;
-var rotationLock = false;
-const cueOptions = {
-    isStatic: true,
-    density: 0.06,
-    friction: 0.8,
-    frictionAir: 0.8,
-    label: "cue",
-    collisionFilter: {
-        category: PLAYER,
-        mask: PLAYER,
-    },
-};
-
 // balls
 var balls = [];
 const ballOptions = {
@@ -208,19 +182,21 @@ function setup() {
         label: "TableCompound",
     });
     // cue
-    cue = Bodies.rectangle(
-        0,
-        -tableWidth / 4,
-        cueLength,
-        cueDiameter,
-        cueOptions
-    );
+    cue = new Cue(
+            createVector(0, -tableWidth / 4),
+            (tableWidth * 5) / 6,
+            tableWidth * 0.014,
+            "#563112",
+            10,
+            2
+        );
 
     // add bodies to world
-    World.add(world, [tableSides, cue]);
+    World.add(world, tableSides);
 
     // translate the world to the center of user window
-    Composite.translate(world,
+    Composite.translate(
+        world,
         {
             x: window.innerWidth / 2,
             y: window.innerHeight / 2
@@ -296,58 +272,9 @@ function draw() {
         balls[i].draw();
     }
 
-    // draw cue
-    push();
-    translate(window.innerWidth / 2, window.innerHeight / 2);
-    translate(cuePosition);
-    rotate(cueRotateDeg);
-    noStroke();
-    fill(cueColor);
-    rect(0, 0, cueLength, cueDiameter);
-    pop();
-
-    // cue movement
-    if (keyIsPressed && !positionLock) {
-        let speed = createVector(0, 0);
-
-        // W
-        if (keyIsDown(87)) {
-            speed.add(0, -cueMoveSpeed);
-        }
-        // A
-        if (keyIsDown(65)) {
-            speed.add(-cueMoveSpeed, 0);
-        }
-        // S
-        if (keyIsDown(83)) {
-            speed.add(0, cueMoveSpeed);
-        }
-        // D
-        if (keyIsDown(68)) {
-            speed.add(cueMoveSpeed, 0);
-        }
-
-        speed.normalize();
-        speed.mult(cueMoveSpeed);
-        cuePosition.add(speed);
-        Body.translate(cue, {
-            x: speed.x,
-            y: speed.y,
-        });
-    }
-
-    // cue rotate
-    if (!rotationLock) {
-        let translateMouseX = mouseX - window.innerWidth / 2;
-        let translateMouseY = mouseY - window.innerHeight / 2;
-        cueRotateDeg = atan2(
-            translateMouseY - cuePosition.y,
-            translateMouseX - cuePosition.x
-        );
-    }
-    // TODO(Casper): Switch to useing angular speed to spin cue instead of useing "setAngle"
-    Body.setAngle(cue, cueRotateDeg);
-    preCueRotateDeg = cueRotateDeg;
+    cue.draw();
+    cue.move();
+    cue.rotate();
 
     // sink check
     for (let i = 0; i < balls.length; i++) {
@@ -396,30 +323,7 @@ function draw() {
 
 function mousePressed() {
     // start deciding push force
-    if (!pushing && positionLock) {
-        pushing = true;
-        rotationLock = true;
-        pushStartPos = createVector(mouseX, mouseY);
-        originalCuePos = cuePosition.copy();
-
-        cueSensor = Bodies.rectangle(
-            cue.position.x,
-            cue.position.y,
-            cueLength,
-            cueDiameter,
-            {
-                isSensor: true,
-                collisionFilter: {
-                    category: SCENE,
-                    mask: SCENE,
-                },
-            }
-        )
-        Body.setAngle(cueSensor, cueRotateDeg);
-
-        // create a sensor for cue
-        World.add(world, cueSensor);
-    }
+    cue.pushStart();
 
     // select color
     if (!selectedColor) {
@@ -443,88 +347,16 @@ function mousePressed() {
 }
 
 function mouseDragged() {
-    if (pushing && positionLock) {
-        // reset cue position
-        cuePosition = originalCuePos.copy();
-        Body.setPosition(cueSensor, {
-            x: window.innerWidth / 2 + cuePosition.x,
-            y: window.innerHeight / 2 + cuePosition.y
-        });
-
-        // calulate cue's moving and store cue position
-        originalCuePos = cuePosition.copy();
-        let pushEndPos = createVector(mouseX, mouseY);
-        let moveLength = min(300, pushEndPos.sub(pushStartPos).mag());
-        let moveDirection = createVector(
-            cos(cueRotateDeg),
-            sin(cueRotateDeg)
-        ).mult(moveLength);
-
-        cuePosition.sub(moveDirection);
-        Body.translate(cueSensor, {
-            x: -moveDirection.x,
-            y: -moveDirection.y
-        });
-
-        // check if cue collision with any ball
-        for (let i = 0; i < balls.length; i++) {
-            // BUG(Casper): Cue sensor cannot detect balls
-            let outcome = Collision.collides(balls[i].info(), cueSensor);
-            if (outcome) {
-                console.log("Detected collision with ball:", i);
-            };
-        }
-    }
+    cue.pushProcess();
 }
 
 async function mouseReleased() {
-    // end deciding push force
-    if (pushing && positionLock) {
-        let pushEndPos = createVector(mouseX, mouseY);
-        let moveLength = min(300, pushEndPos.sub(pushStartPos).mag());
-
-        pushForce = map(moveLength, 0, 300, 0, 10);
-
-        // apply pushing animation
-        console.log("Cue released: Apply push animation");
-        // cuePosition = originalCuePos.copy();
-        let speed = createVector(
-            originalCuePos.x - cuePosition.x,
-            originalCuePos.y - cuePosition.y
-        ).div(pushForce);
-        await cueReposition(speed);
-        // after animation apply velocity to cue's body
-
-        Body.applyForce(cue, cue.position, {
-            x: cos(cueRotateDeg) * pushForce * 0.1,
-            y: sin(cueRotateDeg) * pushForce * 0.1,
-        });
-        console.log(`Cue released: Apply velocity: ${pushForce}`);
-        World.remove(world, cueSensor);
-        Events.off(engine, "collisionStart");
-
-        // back to default state
-        pushing = false;
-        positionLock = false;
-        cue.collisionFilter.category = PLAYER;
-        cue.collisionFilter.mask = PLAYER;
-        setTimeout(() => {rotationLock = false;}, 100);
-    }
+    cue.pushEnd();
 }
 
 function keyPressed() {
-    if (keyCode == 32 && !pushing) {
-        if (positionLock) {
-            cue.collisionFilter.category = PLAYER;
-            cue.collisionFilter.mask = PLAYER;
-            // rotationLock = false;
-        } else {
-            cue.collisionFilter.category = SCENE;
-            cue.collisionFilter.mask = SCENE;
-            // rotationLock = true;
-        }
-
-        positionLock = !positionLock;
+    if (keyCode == 32) {
+        cue.switchMode();
     }
 }
 
@@ -580,20 +412,3 @@ function layoutOfSnookerBalls() {
 }
 
 function chooseColor(target) {}
-
-async function cueReposition(direction) {
-    return new Promise((resolve) => {
-        const step = () => {
-            if (cuePosition.copy().sub(originalCuePos).mag() <= 50) {
-                resolve();
-                cuePosition = originalCuePos.copy();
-                return;
-            }
-
-            cuePosition.add(direction);
-            setTimeout(step, 20);
-        };
-
-        step();
-    });
-}
