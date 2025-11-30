@@ -266,6 +266,7 @@ function draw() {
     cue.rotate();
 
     // sink check
+    // BUG: Sink cannot detect any ball.
     for (let i = 0; i < balls.length; i++) {
         for (let j = 0; j < pocketsPos.length; j++) {
             if (
