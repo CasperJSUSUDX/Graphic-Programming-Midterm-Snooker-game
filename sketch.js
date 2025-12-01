@@ -66,10 +66,6 @@ var selectedColor;
 var cueBallHasCollision = false;
 var redWasPockected = false;
 
-// setting
-// 1 for starting position, 2 for ramdom position(only red balls), 3 for random position(red balls and colors)
-var modes = 1;
-
 // UI
 var UIcontainer;
 var moveUI;
