@@ -1,27 +1,49 @@
 class Rule {
     // 1 for starting position, 2 for ramdom position(only red balls), 3 for random position(red balls and colors)
-    mode = 1;
-    allRedPockected = false;
-    previousHitColor = null;
-    sinkedBalls = [];
-
-    static hitOrderCheck = function(hitColor) {
-        if (!colorOrder.includes(hitColor)) {
-            console.error("Invaild Color");
-            return;
-        }
-        
-        if (allRedPockected) {
-
+    static mode = 1;
+    static allRedPockected = false;
+    static previousHitColor = null;
+    static selectedColor;
+    static sinkedBalls = [];
+    static colors = UI.colorOrder;
+    static hitOrderCheck = function(ball) {       
+        if (this.allRedPockected) {
+            console.log("All red were pockected.");
         } else {
-            if (hitColor === "#ff0000") {
+            if (ball.id === "#ff0000") {
                 score++;
-                
+                selectedColor();
+            } else if (
+                this.previousHitColor === "#ff0000" &&
+                ball.id == this.selectedColor
+            ) {
+                score += ball.score;
             } else {
-
+                console.log("Foul");
             }
         }
 
-        previousHitColor = hitColor;
+        this.previousHitColor = ball.id;
+    }
+
+    static selectColorBall = function() {
+        if (!this.selectedColor) {
+            for (let i = 0; i < this.colors.length; i++) {
+                if (
+                    dist(
+                        mouseX,
+                        mouseY,
+                        window.innerWidth - UI.interval - (this.colors.length - 1 - i) * UI.interval,
+                        UI.interval
+                    ) <= UI.circleSize
+                ) {
+                    if (this.colors[i].match(/40$/gm)) {
+                        break;
+                    } else {
+                        this.selectedColor =  this.colors[i];
+                    }
+                }
+            }
+        }
     }
 }

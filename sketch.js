@@ -11,28 +11,28 @@ const tableColor = "#2A6137";
 const slideColor = "#784315";
 const pocketsPos = [
     {
-        x: -tableLength / 2,
-        y: -tableWidth / 2,
+        x: window.innerWidth / 2 - tableLength / 2,
+        y: window.innerHeight / 2 - tableWidth / 2,
     },
     {
-        x: 0,
-        y: -tableWidth / 2,
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2 - tableWidth / 2,
     },
     {
-        x: tableLength / 2,
-        y: -tableWidth / 2,
+        x: window.innerWidth / 2 + tableLength / 2,
+        y: window.innerHeight / 2 - tableWidth / 2,
     },
     {
-        x: -tableLength / 2,
-        y: tableWidth / 2,
+        x: window.innerWidth / 2 - tableLength / 2,
+        y: window.innerHeight / 2 + tableWidth / 2,
     },
     {
-        x: 0,
-        y: tableWidth / 2,
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2 + tableWidth / 2,
     },
     {
-        x: tableLength / 2,
-        y: tableWidth / 2,
+        x: window.innerWidth / 2 + tableLength / 2,
+        y: window.innerHeight / 2 + tableWidth / 2,
     },
 ];
 var tableSides;
@@ -53,25 +53,8 @@ const tableFriction = 0.1;
 var cue;
 // balls
 var balls = [];
-var colorOrder = [
-    "#ff0000",
-    "#ffff00",
-    "#00ff00",
-    "#784315",
-    "#0000ff",
-    "#EF88BE",
-    "#000000",
-];
-var selectedColor;
-var cueBallHasCollision = false;
-var redWasPockected = false;
 
 // UI
-var UIcontainer;
-var moveUI;
-var moveSlider;
-var moveSensetiveText;
-var currentSensetiveText;
 var scoreUI;
 var score = 0;
 
@@ -95,36 +78,7 @@ function setup() {
 
     // object initial
     layoutOfSnookerBalls();
-
-    // UI
-    UIcontainer = createDiv();
-    UIcontainer.id("ui");
-    UIcontainer.position(10, 10);
-    UIcontainer.style("display", "flex");
-    UIcontainer.style("flex-direction", "column");
-    // move
-    moveUI = createDiv();
-    moveUI.id("ui-move");
-    moveUI.style("display", "flex");
-    moveUI.parent("ui");
-    moveSensetiveText = createSpan("Move sensetive: ");
-    moveSensetiveText.class("ui-text");
-    moveSensetiveText.parent("ui-move");
-    moveSlider = createSlider(0, 20, 10);
-    moveSlider.size(200);
-    moveSlider.parent("ui-move");
-    currentSensetiveText = createSpan(moveSlider.value());
-    currentSensetiveText.class("ui-text");
-    currentSensetiveText.parent("ui-move");
-    moveSlider.changed(() => {
-        currentSensetiveText.html(moveSlider.value());
-        cue.adjustSpeed(moveSlider.value());
-    });
-    // score
-    scoreUI = createSpan(`Score: ${score}`);
-    scoreUI.class("ui-text");
-    scoreUI.parent("ui");
-
+    
     // bodise initial
     // table
     tableSides = Body.create({
@@ -186,6 +140,10 @@ function setup() {
             x: window.innerWidth / 2,
             y: window.innerHeight / 2
         });
+
+    UI.createUIContainer();
+    UI.createMoveSensetiveSlider(cue);
+    UI.createScoreText(score);
 }
 
 function draw() {
@@ -273,63 +231,22 @@ function draw() {
                     pocketsPos[j].y
                 ) < pocketSize
             ) {
-                console.log("drop");
+                Rule.hitOrderCheck(balls[i]);
+                console.log(`Sinked`);
                 World.remove(world, balls[i].body);
-                score += balls[i].score;
-                scoreUI.html(`Score: ${score}`);
                 balls.splice(i, 1);
                 break;
             }
         }
     }
 
-    // select object ball
-    push();
-    for (let i = 0; i < colorOrder.length; i++) {
-        let color = colorOrder[i];
-
-        if (redWasPockected && color.match(/^#ff0000$/g)) {
-            color += "40";
-        } else if (!redWasPockected && !color.match(/(^#ff0000$)|(40$)/g)) {
-            color += "40";
-        }
-
-        fill(color);
-        ellipse(
-            window.innerWidth - 60 - (colorOrder.length - 1 - i) * 60,
-            60,
-            50
-        );
-    }
-    pop();
-
-    // mouse position
+    UI.drawSelectBallArea(Rule.allRedPockected);
     drawMousePos();
 }
 
 function mousePressed() {
-    // start deciding push force
     cue.pushStart();
-
-    // select color
-    if (!selectedColor) {
-        for (let i = 0; i < colorOrder.length; i++) {
-            if (
-                dist(
-                    mouseX,
-                    mouseY,
-                    window.innerWidth - 60 - (colorOrder.length - 1 - i) * 60,
-                    60
-                ) <= 50
-            ) {
-                if (colorOrder[i].match(/40$/gm)) {
-                    break;
-                } else {
-                    selectedColor = colorOrder[i];
-                }
-            }
-        }
-    }
+    Rule.selectColorBall();
 }
 
 function mouseDragged() {
