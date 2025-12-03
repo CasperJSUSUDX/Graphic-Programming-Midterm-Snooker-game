@@ -1,5 +1,5 @@
 class UI {
-    static createUIContainer = function() {
+    static createUIContainer() {
         const UIcontainer = createDiv();
         UIcontainer.id("ui");
         UIcontainer.position(10, 10);
@@ -7,7 +7,7 @@ class UI {
         UIcontainer.style("flex-direction", "column");
     }
     
-    static createMoveSensetiveSlider = function(cue) {
+    static createMoveSensetiveSlider(cue) {
         const moveUI = createDiv();
         moveUI.id("ui-move");
         moveUI.style("display", "flex");
@@ -31,10 +31,16 @@ class UI {
         });
     }
 
-    static createScoreText = function(score) {
-        const scoreUI = createSpan(`Score: ${score}`);
+    static #score = 0;
+    static createScoreText() {
+        const scoreUI = createSpan(`Score: ${this.#score}`);
+        scoreUI.id("score-text")
         scoreUI.class("ui-text");
         scoreUI.parent("ui");
+    }
+    static addAndUpdateScore(num) {
+        this.#score += num;
+        select("#score-text").html(`Score: ${this.#score}`)
     }
 
     static interval = 60;
@@ -48,7 +54,7 @@ class UI {
         "#EF88BE",
         "#000000",
     ];
-    static drawSelectBallArea = function(redWasPockected) {
+    static drawSelectBallArea(redWasPockected) {
         push();
         for (let i = 0; i < this.colorOrder.length; i++) {
             var color = this.colorOrder[i];
