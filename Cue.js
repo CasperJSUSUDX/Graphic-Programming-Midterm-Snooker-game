@@ -221,8 +221,8 @@ class Cue {
                 for (let i = 0; i < balls.length; i++) {
                     if (Collision.collides(balls[i].body, hitSensor)) {
                         Body.applyForce(balls[i].body, balls[i].body.position, {
-                                x: cos(deg) * pushForce * 0.1,
-                                y: sin(deg) * pushForce * 0.1,
+                                x: cos(deg) * pushForce * 0.02,
+                                y: sin(deg) * pushForce * 0.02,
                             });
                         break;
                     }
@@ -237,6 +237,20 @@ class Cue {
                 body.collisionFilter.mask = PLAYER;
                 setTimeout(() => {rotationLock = false;}, 100);
             }
+        }
+
+        // debug use
+        this.drawHitArea = function () {
+            push();
+            translate(
+                body.position.x + (cos(deg) * (length / 2 + hitSupportRange / 2)),
+                body.position.y + (sin(deg) * (length / 2 + hitSupportRange / 2)),
+            );
+            noStroke();
+            fill(255, 0, 0, 75);
+            rotate(deg);
+            rect(0, 0, hitSupportRange);
+            pop();
         }
     }
 }

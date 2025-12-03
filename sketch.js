@@ -58,6 +58,8 @@ var balls = [];
 var scoreUI;
 var score = 0;
 
+var debugMode = true;
+
 function setup() {
     createCanvas(window.innerWidth, window.innerHeight);
     background(255);
@@ -126,7 +128,7 @@ function setup() {
             tableWidth * 0.014,
             "#563112",
             10,
-            2,
+            5,
             ballSize / 2
         );
 
@@ -241,7 +243,11 @@ function draw() {
     }
 
     UI.drawSelectBallArea(Rule.allRedPockected);
-    drawMousePos();
+
+    if (debugMode) {
+        drawMousePos();
+        cue.drawHitArea();
+    }
 }
 
 function mousePressed() {
