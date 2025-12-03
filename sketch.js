@@ -56,7 +56,6 @@ var balls = [];
 
 // UI
 var scoreUI;
-var score = 0;
 
 var debugMode = true;
 
@@ -145,7 +144,7 @@ function setup() {
 
     UI.createUIContainer();
     UI.createMoveSensetiveSlider(cue);
-    UI.createScoreText(score);
+    UI.createScoreText();
 }
 
 function draw() {
@@ -222,7 +221,6 @@ function draw() {
     cue.rotate();
 
     // sink check
-    // BUG: Sink cannot detect any ball.
     for (let i = 0; i < balls.length; i++) {
         for (let j = 0; j < pocketsPos.length; j++) {
             if (
@@ -233,15 +231,18 @@ function draw() {
                     pocketsPos[j].y
                 ) < pocketSize
             ) {
-                Rule.hitOrderCheck(balls[i]);
-                console.log(`Sinked`);
+                if (i == 0) {
+                    Rule.pottedCueBall();
+                } else {
+                    console.log(`Sinked`);
+                }
                 World.remove(world, balls[i].body);
                 balls.splice(i, 1);
-                break;
             }
         }
     }
 
+    Ball.cueBallCollisionCheck();
     UI.drawSelectBallArea(Rule.allRedPockected);
 
     if (debugMode) {
@@ -270,7 +271,7 @@ function keyPressed() {
 }
 
 function drawCornerBackground(position, deg) {
-    let extendSize = pocketSize * 0.4;
+    var extendSize = pocketSize * 0.4;
 
     push();
     rotate(deg);
@@ -308,7 +309,7 @@ function layoutOfSnookerBalls() {
     balls.push(new Ball({ x: (tableLength * 9) / 22, y: 0 }, "#000000", 7));
     // red balls
     for (let i = 0; i < 5; i++) {
-        let basicPosY = (ballSize / 2) * i;
+        var basicPosY = (ballSize / 2) * i;
         for (let j = 0; j <= i; j++) {
             balls.push(
                 new Ball(

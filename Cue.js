@@ -65,7 +65,7 @@ class Cue {
 
         this.move = function () {
             if (keyIsPressed && !positionLock) {
-                let velocity = createVector(0, 0);
+                var velocity = createVector(0, 0);
 
                 // W
                 if (keyIsDown(87)) velocity.add(0, -speed);
@@ -173,7 +173,7 @@ class Cue {
                 // hit ball during pushing
                 for (let i = 0; i < balls.length; i++) {
                     if (Collision.collides(balls[i].body, collisionSensor)) {
-                        console.log("Detected collision with ball:", i);
+                        Rule.missTouching();
                         hitWhenPushing = true;
                         // case 1: Hit white ball
                         if (i === 0) {
@@ -207,8 +207,9 @@ class Cue {
             }
 
             if (pushing && positionLock) {
-                let pushEndPos = createVector(mouseX, mouseY);
-                let moveLength = min(300, pushEndPos.sub(pushStartPos).mag());
+                var pushEndPos = createVector(mouseX, mouseY);
+                var moveLength = min(300, pushEndPos.sub(pushStartPos).mag());
+                var hitBall = null;
 
                 pushForce = map(moveLength, 0, 300, 0, 10);
 
@@ -220,12 +221,16 @@ class Cue {
                 await cueReposition(speed);
                 for (let i = 0; i < balls.length; i++) {
                     if (Collision.collides(balls[i].body, hitSensor)) {
+                        hitBall = balls[i]
                         Body.applyForce(balls[i].body, balls[i].body.position, {
                                 x: cos(deg) * pushForce * 0.02,
                                 y: sin(deg) * pushForce * 0.02,
                             });
                         break;
                     }
+                }
+                if (hitBall == null) {
+                    Rule.failToHitCueBall();
                 }
                 World.remove(world, collisionSensor);
 
