@@ -33,4 +33,24 @@ class Ball {
             pop();
         };
     }
+
+    static #startDetect = false;
+    static #hadCollision = false;
+    static cueBallCollisionCheck() {
+        if (balls[0].body.speed > 0) {
+            this.#startDetect = true;
+            for (let i = 1; i < balls.length; i++) {
+                var collisionEvent = Collision.collides(balls[0].body, balls[i].body);
+                if (collisionEvent) {
+                    Rule.hitColorCheck(balls[i]);
+                    this.#hadCollision = true;
+                    console.log(collisionEvent);
+                }
+            }
+        }
+
+        if (this.#startDetect && !this.#hadCollision) {
+            Rule.hitWrongBall();
+        }
+    }
 }
