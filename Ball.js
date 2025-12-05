@@ -20,9 +20,10 @@ class Ball {
             size / 2,
             ballOptions
         );
+        this.initPosition = {...defaultPosition};
         World.add(world, this.body);
 
-        this.draw = function () {
+        this.draw = function() {
             push();
             translate(this.body.position.x, this.body.position.y);
             rotate(this.body.angle);
@@ -32,6 +33,11 @@ class Ball {
             ellipse(0, 0, size);
             pop();
         };
+
+        this.reposition = function() {
+            Body.setPosition(this.body, this.initPosition);
+            Body.translate(this.body, {x: window.innerWidth / 2, y: window.innerHeight / 2});
+        }
     }
 
     static #startDetect = false;
@@ -42,7 +48,7 @@ class Ball {
             for (let i = 1; i < balls.length; i++) {
                 var collisionEvent = Collision.collides(balls[0].body, balls[i].body);
                 if (collisionEvent) {
-                    Rule.hitColorCheck(balls[i]);
+                    Rule.firstCollisionColor(balls[i]);
                     this.#hadCollision = true;
                     console.log(collisionEvent);
                 }

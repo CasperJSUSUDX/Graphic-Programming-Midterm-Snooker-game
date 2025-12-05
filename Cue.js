@@ -229,7 +229,7 @@ class Cue {
                         break;
                     }
                 }
-                if (hitBall == null) {
+                if (hitBall.id !== "#ffffff") {
                     Rule.failToHitCueBall();
                 }
                 World.remove(world, collisionSensor);
