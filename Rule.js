@@ -49,7 +49,7 @@ class Rule {
     }
 
     // Foul checks
-    static hitColorCheck(ball){
+    static firstCollisionColor(ball){
         if (this.selectedColor == null) this.selectedColor = "#ff0000";
         // hit correct color
         if (ball && this.selectedColor == ball.id) return;
