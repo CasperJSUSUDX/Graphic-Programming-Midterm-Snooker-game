@@ -140,7 +140,8 @@ function setup() {
         {
             x: window.innerWidth / 2,
             y: window.innerHeight / 2
-        });
+        }
+    );
 
     UI.createUIContainer();
     UI.createMoveSensetiveSlider(cue);
@@ -235,9 +236,17 @@ function draw() {
                     Rule.pottedCueBall();
                 } else {
                     console.log(`Sinked`);
+
+                    if (Rule.stage === 1 && balls[i].id !== "#ff0000") {
+                        console.log("Reposition");
+                        balls[i].reposition();
+                        Body.setVelocity(balls[i].body, {x: 0, y: 0});
+                        break;
+                    }
+
+                    World.remove(world, balls[i].body);
+                    balls.splice(i, 1);
                 }
-                World.remove(world, balls[i].body);
-                balls.splice(i, 1);
             }
         }
     }

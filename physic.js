@@ -1,7 +1,5 @@
-const { Engine, Body, Bodies, World, Composite, Render, Runner, Collision, Events } =
+const { Engine, Body, Bodies, World, Composite, Runner, Collision, Events } =
     Matter;
 
 var engine;
-var render;
-var testingBox;
 var world;

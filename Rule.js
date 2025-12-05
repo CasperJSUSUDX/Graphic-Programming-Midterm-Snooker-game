@@ -1,7 +1,7 @@
 class Rule {
     // 1 for starting position, 2 for ramdom position(only red balls), 3 for random position(red balls and colors)
     static mode = 1;
-    // stage 1: red and color ball in turn, stage 2: color order
+    // stage 0: break shoot, stage 1: red and color ball in turn, stage 2: color order
     static stage = 1;
     static allRedPockected = false;
     static previousHitColor = null;
@@ -53,7 +53,7 @@ class Rule {
         if (this.selectedColor == null) this.selectedColor = "#ff0000";
         // hit correct color
         if (ball && this.selectedColor == ball.id) return;
-        this.hitOrPottedWrongBall();
+        this.hitOrPottedWrongBall(ball);
     }
 
     // Foul response
@@ -68,7 +68,7 @@ class Rule {
         console.log("Please select a place.");
     }
 
-    static hitOrPottedWrongBall() {
+    static hitOrPottedWrongBall(ball) {
         console.log("Foul: Hitted or Potted wrong color.");
         UI.addAndUpdateScore(-max(ball.score, 4));
     }
@@ -76,5 +76,9 @@ class Rule {
     static missTouching() {
         console.log("Foul: Touched ball during push.");
         UI.addAndUpdateScore(-4);
+    }
+
+    static hitWrongBall() {
+        console.log("Foul: Hit wrong ball.");
     }
 }

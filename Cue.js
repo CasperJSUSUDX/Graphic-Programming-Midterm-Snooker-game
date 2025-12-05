@@ -221,7 +221,7 @@ class Cue {
                 await cueReposition(speed);
                 for (let i = 0; i < balls.length; i++) {
                     if (Collision.collides(balls[i].body, hitSensor)) {
-                        hitBall = balls[i]
+                        hitBall = balls[i];
                         Body.applyForce(balls[i].body, balls[i].body.position, {
                                 x: cos(deg) * pushForce * 0.02,
                                 y: sin(deg) * pushForce * 0.02,
@@ -229,9 +229,12 @@ class Cue {
                         break;
                     }
                 }
-                if (hitBall.id !== "#ffffff") {
-                    Rule.failToHitCueBall();
+                if (hitBall) {
+                    if (hitBall.id !== "#ffffff") {
+                        Rule.failToHitCueBall();
+                    }
                 }
+                
                 World.remove(world, collisionSensor);
 
                 // back to default state

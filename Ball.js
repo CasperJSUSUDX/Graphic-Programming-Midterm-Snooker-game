@@ -59,4 +59,9 @@ class Ball {
             Rule.hitWrongBall();
         }
     }
+
+    // TODO: Finish this function
+    static ballCollisionWithWallCheck() {
+
+    }
 }
