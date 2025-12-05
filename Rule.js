@@ -77,8 +77,4 @@ class Rule {
         console.log("Foul: Touched ball during push.");
         UI.addAndUpdateScore(-4);
     }
-
-    static hitWrongBall() {
-        console.log("Foul: Hit wrong ball.");
-    }
 }

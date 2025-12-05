@@ -56,7 +56,7 @@ class Ball {
         }
 
         if (this.#startDetect && !this.#hadCollision) {
-            Rule.hitWrongBall();
+            Rule.hitOrPottedWrongBall();
         }
     }
 
