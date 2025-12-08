@@ -36,7 +36,6 @@ const pocketsPos = [
     },
 ];
 var tableSides;
-var tableSensor
 const tableRestitution = 0.7;
 const tableFriction = 0.1;
 const tableOptions = {
@@ -44,15 +43,6 @@ const tableOptions = {
     restitution: tableRestitution,
     friction: tableFriction,
     label: "Wall",
-    collisionFilter: {
-        category: SCENE,
-        mask: SCENE,
-    },
-};
-const tableSensorOptions = {
-    ccd: true,
-    isSensor: true,
-    label: "WallSensor",
     collisionFilter: {
         category: SCENE,
         mask: SCENE,
@@ -97,7 +87,7 @@ function setup() {
             Bodies.rectangle(
                 0,
                 -tableWidth / 2 - ballSize / 2,
-                tableLength - ballSize / 4,
+                tableLength,
                 ballSize,
                 tableOptions
             ),
@@ -106,14 +96,14 @@ function setup() {
                 -tableLength / 2 - ballSize / 2,
                 0,
                 ballSize,
-                tableWidth - ballSize / 4,
+                tableWidth,
                 tableOptions
             ),
             // bottom
             Bodies.rectangle(
                 0,
                 tableWidth / 2 + ballSize / 2,
-                tableLength - ballSize / 4,
+                tableLength,
                 ballSize,
                 tableOptions
             ),
@@ -122,49 +112,12 @@ function setup() {
                 tableLength / 2 + ballSize / 2,
                 0,
                 ballSize,
-                tableWidth - ballSize / 4,
+                tableWidth,
                 tableOptions
             ),
         ],
         isStatic: true,
         label: "TableCompound",
-    });
-    tableSensor = Body.create({
-        parts: [
-            // top
-            Bodies.rectangle(
-                0,
-                -tableWidth / 2 - ballSize / 2,
-                tableLength,
-                ballSize,
-                tableSensorOptions
-            ),
-            // left
-            Bodies.rectangle(
-                -tableLength / 2 - ballSize / 2,
-                0,
-                ballSize,
-                tableWidth,
-                tableSensorOptions
-            ),
-            // bottom
-            Bodies.rectangle(
-                0,
-                tableWidth / 2 + ballSize / 2,
-                tableLength,
-                ballSize,
-                tableSensorOptions
-            ),
-            // right
-            Bodies.rectangle(
-                tableLength / 2 + ballSize / 2,
-                0,
-                ballSize,
-                tableWidth,
-                tableSensorOptions
-            ),
-        ],
-        label: "TableSensorCompound",
     });
 
     // cue
@@ -179,7 +132,7 @@ function setup() {
         );
 
     // add bodies to world
-    World.add(world, [tableSides, tableSensor]);
+    World.add(world, tableSides);
 
     // translate the world to the center of user window
     Composite.translate(

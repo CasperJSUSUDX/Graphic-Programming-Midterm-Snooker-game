@@ -69,8 +69,8 @@ class Ball {
     static ballCollisionWithWallCheck() {
         for (let i = 0; i < this.checkList.length; i++) {
             var collided = null;
-            for (let j = 1; j < tableSensor.parts.length; j++) {
-                collided = Collision.collides(this.checkList[i].body, tableSensor.parts[j]);
+            for (let j = 1; j < tableSides.parts.length; j++) {
+                collided = Collision.collides(this.checkList[i].body, tableSides.parts[j]);
                 break;
             }
             
