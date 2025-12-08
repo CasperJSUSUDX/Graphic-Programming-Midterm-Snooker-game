@@ -6,48 +6,7 @@ const PLAYER = 0b0010;
 const tableLength = window.innerWidth * 0.6;
 const tableWidth = tableLength / 2;
 const ballSize = tableWidth / 36;
-const pocketSize = ballSize * 1.5;
-const tableColor = "#2A6137";
-const slideColor = "#784315";
-const pocketsPos = [
-    {
-        x: window.innerWidth / 2 - tableLength / 2,
-        y: window.innerHeight / 2 - tableWidth / 2,
-    },
-    {
-        x: window.innerWidth / 2,
-        y: window.innerHeight / 2 - tableWidth / 2,
-    },
-    {
-        x: window.innerWidth / 2 + tableLength / 2,
-        y: window.innerHeight / 2 - tableWidth / 2,
-    },
-    {
-        x: window.innerWidth / 2 - tableLength / 2,
-        y: window.innerHeight / 2 + tableWidth / 2,
-    },
-    {
-        x: window.innerWidth / 2,
-        y: window.innerHeight / 2 + tableWidth / 2,
-    },
-    {
-        x: window.innerWidth / 2 + tableLength / 2,
-        y: window.innerHeight / 2 + tableWidth / 2,
-    },
-];
-var tableSides;
-const tableRestitution = 0.7;
-const tableFriction = 0.1;
-const tableOptions = {
-    ccd: true,
-    restitution: tableRestitution,
-    friction: tableFriction,
-    label: "Wall",
-    collisionFilter: {
-        category: SCENE,
-        mask: SCENE,
-    },
-};
+var scene;
 // cue
 var cue;
 // balls
@@ -79,48 +38,15 @@ function setup() {
     // object initial
     layoutOfSnookerBalls();
     
-    // bodise initial
-    // table
-    tableSides = Body.create({
-        parts: [
-            // top
-            Bodies.rectangle(
-                0,
-                -tableWidth / 2 - ballSize / 2,
-                tableLength,
-                ballSize,
-                tableOptions
-            ),
-            // left
-            Bodies.rectangle(
-                -tableLength / 2 - ballSize / 2,
-                0,
-                ballSize,
-                tableWidth,
-                tableOptions
-            ),
-            // bottom
-            Bodies.rectangle(
-                0,
-                tableWidth / 2 + ballSize / 2,
-                tableLength,
-                ballSize,
-                tableOptions
-            ),
-            // right
-            Bodies.rectangle(
-                tableLength / 2 + ballSize / 2,
-                0,
-                ballSize,
-                tableWidth,
-                tableOptions
-            ),
-        ],
-        isStatic: true,
-        label: "TableCompound",
-    });
-
-    // cue
+    // bodies initial
+    scene = new Scene(
+        tableLength,
+        tableWidth,
+        ballSize,
+        ballSize*1.5,
+        "#2A6137",
+        "#784315"
+    );
     cue = new Cue(
             createVector(0, -tableWidth / 4),
             (tableWidth * 5) / 6,
@@ -130,9 +56,6 @@ function setup() {
             5,
             ballSize / 2
         );
-
-    // add bodies to world
-    World.add(world, tableSides);
 
     // translate the world to the center of user window
     Composite.translate(
@@ -154,63 +77,7 @@ function draw() {
 
     background(255);
 
-    // draw table
-    push();
-    translate(window.innerWidth / 2, window.innerHeight / 2);
-    // table
-    noStroke();
-    fill(tableColor);
-    rect(0, 0, tableLength, tableWidth);
-    // lines
-    stroke(255);
-    strokeWeight(2);
-    noFill();
-    line(
-        -tableLength * 0.3,
-        -tableWidth / 2,
-        -tableLength * 0.3,
-        tableWidth / 2
-    );
-    arc(
-        -tableLength * 0.3,
-        0,
-        tableWidth / 3,
-        tableWidth / 3,
-        PI / 2,
-        (PI * 3) / 2
-    );
-    // slide
-    noStroke();
-    fill(slideColor);
-    rect(0, -tableWidth / 2 - ballSize / 2, tableLength, ballSize);
-    rect(-tableLength / 2 - ballSize / 2, 0, ballSize, tableWidth);
-    rect(0, tableWidth / 2 + ballSize / 2, tableLength, ballSize);
-    rect(tableLength / 2 + ballSize / 2, 0, ballSize, tableWidth);
-    // background of pockets
-    noStroke();
-    fill(255, 255, 0);
-    drawCornerBackground(createVector(-tableLength / 2, -tableWidth / 2), 0);
-    drawCornerBackground(
-        createVector(-tableWidth / 2, -tableLength / 2),
-        PI / 2
-    );
-    drawCornerBackground(createVector(-tableLength / 2, -tableWidth / 2), PI);
-    drawCornerBackground(
-        createVector(-tableWidth / 2, -tableLength / 2),
-        (PI * 3) / 2
-    );
-    rect(0, -tableWidth / 2 - ballSize / 2, ballSize * 2, ballSize);
-    rect(0, tableWidth / 2 + ballSize / 2, ballSize * 2, ballSize);
-    // pockets
-    noStroke();
-    fill(0);
-    ellipse(-tableLength / 2, -tableWidth / 2, pocketSize);
-    ellipse(0, -tableWidth / 2, pocketSize);
-    ellipse(tableLength / 2, -tableWidth / 2, pocketSize);
-    ellipse(-tableLength / 2, tableWidth / 2, pocketSize);
-    ellipse(0, tableWidth / 2, pocketSize);
-    ellipse(tableLength / 2, tableWidth / 2, pocketSize);
-    pop();
+    scene.draw();
 
     // draw balls
     for (let i = 0; i < balls.length; i++) {
@@ -221,35 +88,7 @@ function draw() {
     cue.move();
     cue.rotate();
 
-    // sink check
-    for (let i = 0; i < balls.length; i++) {
-        for (let j = 0; j < pocketsPos.length; j++) {
-            if (
-                dist(
-                    balls[i].body.position.x,
-                    balls[i].body.position.y,
-                    pocketsPos[j].x,
-                    pocketsPos[j].y
-                ) < pocketSize
-            ) {
-                if (i == 0) {
-                    Rule.pottedCueBall();
-                } else {
-                    console.log(`Sinked`);
-
-                    if (Rule.stage === 1 && balls[i].id !== "#ff0000") {
-                        console.log("Reposition");
-                        balls[i].reposition();
-                        Body.setVelocity(balls[i].body, {x: 0, y: 0});
-                        break;
-                    }
-
-                    World.remove(world, balls[i].body);
-                    balls.splice(i, 1);
-                }
-            }
-        }
-    }
+    scene.sinkCheck();
 
     Ball.cueBallCollisionCheck();
     Ball.ballCollisionWithWallCheck();
@@ -282,24 +121,6 @@ function keyPressed() {
             cue.switchMode();
         }
     }
-}
-
-function drawCornerBackground(position, deg) {
-    var extendSize = pocketSize * 0.4;
-
-    push();
-    rotate(deg);
-    translate(position.x, position.y);
-    beginShape();
-    vertex(0, extendSize);
-    vertex(-ballSize, extendSize);
-    vertex(-ballSize, -ballSize);
-    vertex(extendSize, -ballSize);
-    vertex(extendSize, 0);
-    vertex(0, 0);
-    vertex(0, extendSize);
-    endShape();
-    pop();
 }
 
 function layoutOfSnookerBalls() {
