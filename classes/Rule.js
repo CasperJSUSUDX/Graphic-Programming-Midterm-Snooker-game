@@ -83,7 +83,7 @@ class Rule {
         Body.setPosition(cueBall.body, vector);
         for (let i = 1; i < balls.length; i++) {
             if (Collision.collides(cueBall.body, balls[i].body)) {
-                alert("Decline: Cannot put at this place.");
+                UI.updateProgressSpan("Cannot put cue ball at there.");
                 cueBall.reposition();
                 decline = true;
                 break;

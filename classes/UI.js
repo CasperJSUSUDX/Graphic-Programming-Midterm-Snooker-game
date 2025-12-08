@@ -8,10 +8,10 @@ class UI {
     }
     
     static createMoveSensetiveSlider(cue) {
-        const moveUI = createDiv();
-        moveUI.id("ui-move");
-        moveUI.style("display", "flex");
-        moveUI.parent("ui");
+        const container = createDiv();
+        container.id("ui-move");
+        container.style("display", "flex");
+        container.parent("ui");
 
         const moveSensetiveText = createSpan("Move sensetive: ");
         moveSensetiveText.class("ui-text");
@@ -41,6 +41,39 @@ class UI {
     static addAndUpdateScore(num) {
         this.#score += num;
         select("#score-text").html(`Score: ${this.#score}`)
+    }
+
+    static createProgressText() {
+        const container = createDiv();
+        container.style("display", "flex");
+        container.style("flex-direction", "column");
+        container.style("justify-self", "center");
+        container.style("position", "absolute");
+        container.style("left", `${window.innerWidth / 2 - 200}px`);
+        container.style("top", "0");
+
+        const stageSpan = createSpan("Stage: 0 - Break shot");
+        stageSpan.style("text-align", "center");
+        stageSpan.style("font-size", "4vh");
+        stageSpan.class("ui-text");
+        stageSpan.parent(container);
+
+        const messageSpan = createSpan("");
+        messageSpan.id("ui-message");
+        messageSpan.style("text-align", "center");
+        messageSpan.style("font-size", "3vh");
+        messageSpan.class("ui-text");
+        messageSpan.parent(container);
+    }
+    static updateProgressSpan(message) {
+        const span = select("#ui-message");
+        span.class("ui-text warn");
+        span.html(message);
+
+        setTimeout(() => {
+            span.class("ui-text warn");
+            span.html("");
+        }, 2000);
     }
 
     static interval = 60;

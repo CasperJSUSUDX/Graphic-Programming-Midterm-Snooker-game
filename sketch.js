@@ -69,6 +69,7 @@ function setup() {
     UI.createUIContainer();
     UI.createMoveSensetiveSlider(cue);
     UI.createScoreText();
+    UI.createProgressText();
 }
 
 function draw() {
