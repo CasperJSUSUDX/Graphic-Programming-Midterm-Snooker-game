@@ -115,7 +115,7 @@ async function mouseReleased() {
 function keyPressed() {
     if (keyCode == 32) {
         if (Rule.stage === 0) {
-
+            Rule.selectPosInDZone(balls[0]);
         } else {
             cue.switchMode();
         }
