@@ -26,7 +26,6 @@ class Rule {
 
         this.previousHitColor = ball.id;
     }
-
     static selectColorBall() {
         if (!this.selectedColor) {
             for (let i = 0; i < this.colors.length; i++) {
@@ -61,18 +60,15 @@ class Rule {
         UI.addAndUpdateScore(-4);
         console.log("Foul: Didn't hit cue ball.");
     }
-
     static pottedCueBall() {
         console.log("Foul: Cue ball in pocket.")
         UI.addAndUpdateScore(-4);
         console.log("Please select a place.");
     }
-
     static hitOrPottedWrongBall(ball) {
         console.log("Foul: Hitted or Potted wrong color.");
         UI.addAndUpdateScore(-max(ball.score, 4));
     }
-
     static missTouching() {
         console.log("Foul: Touched ball during push.");
         UI.addAndUpdateScore(-4);

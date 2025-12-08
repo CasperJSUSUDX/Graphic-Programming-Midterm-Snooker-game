@@ -41,27 +41,45 @@ class Ball {
     }
 
     static #startDetect = false;
+    static #endDetect = false;
     static #hadCollision = false;
     static cueBallCollisionCheck() {
-        if (balls[0].body.speed > 0) {
+        if (balls[0].body.speed > 0.001) {
             this.#startDetect = true;
             for (let i = 1; i < balls.length; i++) {
-                var collisionEvent = Collision.collides(balls[0].body, balls[i].body);
-                if (collisionEvent) {
+                var collided = Collision.collides(balls[0].body, balls[i].body);
+                if (collided) {
                     Rule.firstCollisionColor(balls[i]);
                     this.#hadCollision = true;
-                    console.log(collisionEvent);
+                    console.log(`${balls[0].id} collided with cue ball\n${collided}`);
                 }
             }
+        } else if (this.#startDetect && !this.#endDetect) {
+            this.#startDetect = false;
+            this.#endDetect = true;
         }
 
-        if (this.#startDetect && !this.#hadCollision) {
-            Rule.hitOrPottedWrongBall();
+        if (!this.#startDetect && this.#endDetect && !this.#hadCollision) {
+            Rule.hitOrPottedWrongBall(balls[0]);
+            this.#endDetect = false;
         }
     }
 
-    // TODO: Finish this function
+    static checkList = [];
     static ballCollisionWithWallCheck() {
-
+        for (let i = 0; i < this.checkList.length; i++) {
+            var collided = null;
+            for (let j = 1; j < tableSensor.parts.length; j++) {
+                collided = Collision.collides(this.checkList[i].body, tableSensor.parts[j]);
+                break;
+            }
+            
+            if (collided) {
+                console.log(`${this.checkList[i].id} collided with wall`);
+                console.log(collided);
+                this.checkList.splice(i, 1);
+                i--;
+            }
+        }
     }
 }
