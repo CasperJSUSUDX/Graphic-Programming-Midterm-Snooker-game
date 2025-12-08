@@ -79,7 +79,6 @@ function draw() {
 
     scene.draw();
 
-    // draw balls
     for (let i = 0; i < balls.length; i++) {
         balls[i].draw();
     }
