@@ -47,20 +47,20 @@ class UI {
         const container = createDiv();
         container.style("display", "flex");
         container.style("flex-direction", "column");
-        container.style("justify-self", "center");
+        // container.style("align-items", "center");
         container.style("position", "absolute");
         container.style("left", `${window.innerWidth / 2 - 200}px`);
         container.style("top", "0");
 
         const stageSpan = createSpan("Stage: 0 - Break shot");
-        stageSpan.style("text-align", "center");
+        // stageSpan.style("text-align", "center");
         stageSpan.style("font-size", "4vh");
         stageSpan.class("ui-text");
         stageSpan.parent(container);
 
         const messageSpan = createSpan("");
         messageSpan.id("ui-message");
-        messageSpan.style("text-align", "center");
+        // messageSpan.style("text-align", "center");
         messageSpan.style("font-size", "3vh");
         messageSpan.class("ui-text");
         messageSpan.parent(container);
@@ -70,10 +70,10 @@ class UI {
         span.class("ui-text warn");
         span.html(message);
 
-        setTimeout(() => {
-            span.class("ui-text warn");
-            span.html("");
-        }, time);
+        // setTimeout(() => {
+        //     span.class("ui-text warn");
+        //     span.html("");
+        // }, time);
     }
 
     static interval = 60;

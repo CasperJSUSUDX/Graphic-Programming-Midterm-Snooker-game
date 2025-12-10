@@ -7,7 +7,7 @@ class Cue {
      * @param {Number} _speed 
      * @param {Number} _pushForce 
      */
-    constructor (_initPos, _length, _diameter, _color, _speed, _pushForce, _hitSupportRange) {
+    constructor (_initPos, _length, _diameter, _color, _speed, _maxPushForce, _hitSupportRange) {
         const bodyOptions = {
             isStatic: true,
             density: 0.06,
@@ -32,7 +32,7 @@ class Cue {
         var diameter = _diameter;
         var color = _color;
         var speed = _speed;
-        var pushForce = _pushForce;
+        var maxPushForce = _maxPushForce;
         var hitSupportRange = _hitSupportRange;
         var pushing = false;
         var hitWhenPushing = false;
@@ -100,7 +100,7 @@ class Cue {
         }
 
         this.switchMode = function () {
-            if (!pushing) {
+            if (!pushing && !Rule.isAnyBallMoving()) {
                 if (positionLock) {
                     body.collisionFilter.category = PLAYER;
                     body.collisionFilter.mask = PLAYER;
@@ -171,8 +171,8 @@ class Cue {
                 });
 
                 // hit ball during pushing
-                for (let i = 0; i < balls.length; i++) {
-                    if (Collision.collides(balls[i].body, collisionSensor)) {
+                for (let i = 0; i < Ball.balls.length; i++) {
+                    if (Collision.collides(Ball.balls[i].body, collisionSensor)) {
                         Rule.missTouching();
                         hitWhenPushing = true;
                         // case 1: Hit white ball
@@ -206,23 +206,40 @@ class Cue {
                 });
             }
 
+            async function turnEnd(interval) {
+                setTimeout(() => {
+                    return new Promise(() => {
+                        console.log("Turn start");
+                        const step = () => {
+                            if (!Rule.isAnyBallMoving()) {
+                                Rule.turnEndCheck();
+                                console.log("Turn end");
+                                return;
+                            }
+
+                            setTimeout(step, interval);
+                        };
+
+                        step();
+                    });
+                }, 100);
+            }
+
             if (pushing && positionLock) {
                 var pushEndPos = createVector(mouseX, mouseY);
                 var moveLength = min(300, pushEndPos.sub(pushStartPos).mag());
                 var hitBall = null;
+                var pushForce = map(moveLength, 0, 300, 0, maxPushForce * 10);
 
-                pushForce = map(moveLength, 0, 300, 0, 10);
-
-                // apply pushing animation
                 const speed = createVector(
                     originalBodyPos.x - position.x,
                     originalBodyPos.y - position.y
-                ).div(pushForce);
+                ).div(5);
                 await cueReposition(speed);
-                for (let i = 0; i < balls.length; i++) {
-                    if (Collision.collides(balls[i].body, hitSensor)) {
-                        hitBall = balls[i];
-                        Body.applyForce(balls[i].body, balls[i].body.position, {
+                for (let i = 0; i < Ball.balls.length; i++) {
+                    if (Collision.collides(Ball.balls[i].body, hitSensor)) {
+                        hitBall = Ball.balls[i];
+                        Body.applyForce(Ball.balls[i].body, Ball.balls[i].body.position, {
                                 x: cos(deg) * pushForce * 0.02,
                                 y: sin(deg) * pushForce * 0.02,
                             });
@@ -232,20 +249,26 @@ class Cue {
                 if (hitBall) {
                     if (hitBall.id !== "#ffffff") {
                         Rule.failToHitCueBall(hitBall.score);
+                    } else if (Rule.stage === 0) {
+                        for (const ball of Ball.balls) {
+                            if (ball.id === "#ff0000") {
+                                Ball.checkList.push(ball);
+                            }
+                        }
                     }
                 } else {
                     Rule.failToHitCueBall();
                 }
-                
                 World.remove(world, collisionSensor);
 
-                // back to default state
-                pushing = false;
-                positionLock = false;
-                hitWhenPushing = false;
-                body.collisionFilter.category = PLAYER;
-                body.collisionFilter.mask = PLAYER;
-                setTimeout(() => {rotationLock = false;}, 100);
+                turnEnd(20).then(() => {
+                    pushing = false;
+                    positionLock = false;
+                    hitWhenPushing = false;
+                    rotationLock = false;
+                    body.collisionFilter.category = PLAYER;
+                    body.collisionFilter.mask = PLAYER;
+                });
             }
         }
 

@@ -138,32 +138,22 @@ class Scene {
             pop();
         }
 
+        this.sinkedList = [];
         this.sinkCheck = function() {
-            for (let i = 0; i < balls.length; i++) {
+            for (let i = 0; i < Ball.balls.length; i++) {
                 for (let j = 0; j < this.pocketsPos.length; j++) {
                     if (
                         dist(
-                            balls[i].body.position.x,
-                            balls[i].body.position.y,
+                            Ball.balls[i].body.position.x,
+                            Ball.balls[i].body.position.y,
                             this.pocketsPos[j].x,
                             this.pocketsPos[j].y
                         ) < pocketSize
                     ) {
-                        if (i == 0) {
-                            Rule.pottedCueBall();
-                        } else {
-                            console.log(`Sinked`);
-
-                            if (Rule.stage === 1 && balls[i].id !== "#ff0000") {
-                                console.log("Reposition");
-                                balls[i].reposition();
-                                Body.setVelocity(balls[i].body, {x: 0, y: 0});
-                                break;
-                            }
-
-                            World.remove(world, balls[i].body);
-                            balls.splice(i, 1);
-                        }
+                        Ball.balls[i].visiable = false;
+                        Body.set(Ball.balls[i], "isSensor", true);
+                        Body.setVelocity(Ball.balls[i].body, {x: 0, y: 0});
+                        this.sinkedList.push(Ball.balls[i]);
                     }
                 }
             }

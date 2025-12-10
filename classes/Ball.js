@@ -12,6 +12,7 @@ class Ball {
                 mask: SCENE,
             },
         };
+        this.visiable = true;
         this.id = color;
         this.score = score;
         this.body = Bodies.circle(
@@ -24,14 +25,17 @@ class Ball {
         World.add(world, this.body);
 
         this.draw = function() {
-            push();
-            translate(this.body.position.x, this.body.position.y);
-            rotate(this.body.angle);
-            stroke(0);
-            strokeWeight(0.5);
-            fill(color);
-            ellipse(0, 0, size);
-            pop();
+            if (this.visiable) {
+                push();
+                translate(this.body.position.x, this.body.position.y);
+                rotate(this.body.angle);
+                stroke(0);
+                strokeWeight(0.5);
+                fill(color);
+                ellipse(0, 0, size);
+                pop();
+            }
+            
         };
 
         this.reposition = function() {
@@ -40,18 +44,19 @@ class Ball {
         }
     }
 
+    static balls = [];
     static #startDetect = false;
     static #endDetect = false;
     static #hadCollision = false;
     static cueBallCollisionCheck() {
-        if (balls[0].body.speed > 0.001) {
+        if (this.balls[0].body.speed > 0.01) {
             this.#startDetect = true;
-            for (let i = 1; i < balls.length; i++) {
-                var collided = Collision.collides(balls[0].body, balls[i].body);
+            for (let i = 1; i < this.balls.length; i++) {
+                var collided = Collision.collides(this.balls[0].body, this.balls[i].body);
                 if (collided) {
-                    Rule.firstCollisionColor(balls[i]);
+                    Rule.firstCollisionColor(this.balls[i]);
                     this.#hadCollision = true;
-                    console.log(`${balls[0].id} collided with cue ball\n${collided}`);
+                    console.log(`${this.balls[0].id} collided with cue ball\n${collided}`);
                 }
             }
         } else if (this.#startDetect && !this.#endDetect) {
@@ -60,7 +65,7 @@ class Ball {
         }
 
         if (!this.#startDetect && this.#endDetect && !this.#hadCollision) {
-            Rule.hitOrPottedWrongBall(balls[0]);
+            Rule.hitOrPottedWrongBall(this.balls[0]);
             this.#endDetect = false;
         }
     }
@@ -69,9 +74,9 @@ class Ball {
     static ballCollisionWithWallCheck() {
         for (let i = 0; i < this.checkList.length; i++) {
             var collided = null;
-            for (let j = 1; j < tableSides.parts.length; j++) {
-                collided = Collision.collides(this.checkList[i].body, tableSides.parts[j]);
-                break;
+            for (let j = 1; j < scene.body.parts.length; j++) {
+                collided = Collision.collides(this.checkList[i].body, scene.body.parts[j]);
+                if (collided) break;
             }
             
             if (collided) {
@@ -81,5 +86,50 @@ class Ball {
                 i--;
             }
         }
+    }
+
+    static selectPosInDZone(cueBall) {
+        const vector = {
+            x: 0,
+            y: 0
+        }
+        const rightLimit = window.innerWidth / 2 - tableLength * 0.3;
+        const leftLimit = window.innerWidth / 2 - tableLength * 0.3 - tableWidth / 6;
+        vector.x = -tableLength * 0.35;
+        if (mouseX >= rightLimit) {
+            vector.x = rightLimit;
+        } else if (mouseX <= leftLimit) {
+            vector.x = leftLimit;
+        } else {
+            vector.x = mouseX;
+        }
+
+        const l_square = (tableWidth / 6) ** 2 - (rightLimit - vector.x) ** 2;
+        var l;
+        if (l_square <= 0.001) l = tableWidth / 6;
+        else l = Math.sqrt((tableWidth / 6) ** 2 - (rightLimit - vector.x) ** 2);
+        const topLimit = window.innerHeight / 2 - l;
+        const bottomLimit = window.innerHeight / 2 + l;
+        vector.y = 0;
+        if (mouseY <= topLimit) {
+            vector.y = topLimit;
+        } else if (mouseY >= bottomLimit) {
+            vector.y = bottomLimit;
+        } else {
+            vector.y = mouseY;
+        }
+
+        Body.set(cueBall.body, "isSensor", true);
+        Body.setPosition(cueBall.body, vector);
+        for (let i = 1; i < this.balls.length; i++) {
+            if (Collision.collides(cueBall.body, this.balls[i].body)) {
+                UI.updateProgressSpan("Cannot put cue ball at there.", 2000);
+                cueBall.reposition();
+                return false;
+            }
+        }
+        Body.set(cueBall.body, "isSensor", false);
+
+        return true;
     }
 }

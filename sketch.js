@@ -1,20 +1,10 @@
-// collision group
 const SCENE = 0b0001;
 const PLAYER = 0b0010;
-
-// table
 const tableLength = window.innerWidth * 0.6;
 const tableWidth = tableLength / 2;
 const ballSize = tableWidth / 36;
 var scene;
-// cue
 var cue;
-// balls
-var balls = [];
-
-// UI
-var scoreUI;
-
 var debugMode = true;
 
 function setup() {
@@ -53,7 +43,7 @@ function setup() {
             tableWidth * 0.014,
             "#563112",
             10,
-            5,
+            4,
             ballSize / 2
         );
 
@@ -80,8 +70,8 @@ function draw() {
 
     scene.draw();
 
-    for (let i = 0; i < balls.length; i++) {
-        balls[i].draw();
+    for (let i = 0; i < Ball.balls.length; i++) {
+        Ball.balls[i].draw();
     }
 
     cue.draw();
@@ -115,8 +105,8 @@ async function mouseReleased() {
 
 function keyPressed() {
     if (keyCode == 32) {
-        if (Rule.stage === 0) {
-            Rule.selectPosInDZone(balls[0]);
+        if (Rule.stage === 0 && !Rule.selectedCueBallInitPos) {
+            Rule.selectedCueBallInitPos = Ball.selectPosInDZone(Ball.balls[0]);
         } else {
             cue.switchMode();
         }
@@ -125,28 +115,28 @@ function keyPressed() {
 
 function layoutOfSnookerBalls() {
     // cue ball
-    balls.push(new Ball({ x: -tableLength * 0.35, y: 0 }, "#ffffff"));
+    Ball.balls.push(new Ball({ x: -tableLength * 0.35, y: 0 }, "#ffffff"));
     // yellow ball
-    balls.push(
+    Ball.balls.push(
         new Ball({ x: -tableLength * 0.3, y: tableWidth / 6 }, "#ffff00", 2)
     );
     // browen ball
-    balls.push(new Ball({ x: -tableLength * 0.3, y: 0 }, "#784315", 4));
+    Ball.balls.push(new Ball({ x: -tableLength * 0.3, y: 0 }, "#784315", 4));
     // green ball
-    balls.push(
+    Ball.balls.push(
         new Ball({ x: -tableLength * 0.3, y: -tableWidth / 6 }, "#00ff00", 3)
     );
     // blue ball
-    balls.push(new Ball({ x: 0, y: 0 }, "#0000ff", 5));
+    Ball.balls.push(new Ball({ x: 0, y: 0 }, "#0000ff", 5));
     // pink
-    balls.push(new Ball({ x: tableLength / 4, y: 0 }, "#EF88BE", 6));
+    Ball.balls.push(new Ball({ x: tableLength / 4, y: 0 }, "#EF88BE", 6));
     // black ball
-    balls.push(new Ball({ x: (tableLength * 9) / 22, y: 0 }, "#000000", 7));
+    Ball.balls.push(new Ball({ x: (tableLength * 9) / 22, y: 0 }, "#000000", 7));
     // red balls
     for (let i = 0; i < 5; i++) {
         var basicPosY = (ballSize / 2) * i;
         for (let j = 0; j <= i; j++) {
-            balls.push(
+            Ball.balls.push(
                 new Ball(
                     { x: tableLength / 4 + ballSize * (i + 1), y: basicPosY - ballSize * j },
                     "#ff0000"
