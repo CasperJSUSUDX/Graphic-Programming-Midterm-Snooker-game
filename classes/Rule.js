@@ -83,7 +83,7 @@ class Rule {
         Body.setPosition(cueBall.body, vector);
         for (let i = 1; i < balls.length; i++) {
             if (Collision.collides(cueBall.body, balls[i].body)) {
-                UI.updateProgressSpan("Cannot put cue ball at there.");
+                UI.updateProgressSpan("Cannot put cue ball at there.", 2000);
                 cueBall.reposition();
                 decline = true;
                 break;
@@ -104,21 +104,22 @@ class Rule {
     }
 
     // Foul response
-    static failToHitCueBall() {
-        UI.addAndUpdateScore(-4);
-        console.log("Foul: Didn't hit cue ball.");
+    static failToHitCueBall(score = 0) {
+        UI.addAndUpdateScore(-max(4, score));
+        UI.updateProgressSpan("Foul: Didn't hit cue ball.", 2000);
     }
     static pottedCueBall() {
-        console.log("Foul: Cue ball in pocket.")
+        // TODO: Fix cue ball will sink multiple times bug
+        UI.updateProgressSpan("Foul: Cue ball in pocket.", 2000);
         UI.addAndUpdateScore(-4);
         console.log("Please select a place.");
     }
     static hitOrPottedWrongBall(ball) {
-        console.log("Foul: Hitted or Potted wrong color.");
+        UI.updateProgressSpan("Foul: Hitted or Potted wrong color.", 2000);
         UI.addAndUpdateScore(-max(ball.score, 4));
     }
     static missTouching() {
-        console.log("Foul: Touched ball during push.");
+        UI.updateProgressSpan("Foul: Touched ball during push.", 2000);
         UI.addAndUpdateScore(-4);
     }
 }

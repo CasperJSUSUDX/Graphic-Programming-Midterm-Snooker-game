@@ -65,7 +65,7 @@ class UI {
         messageSpan.class("ui-text");
         messageSpan.parent(container);
     }
-    static updateProgressSpan(message) {
+    static updateProgressSpan(message, time) {
         const span = select("#ui-message");
         span.class("ui-text warn");
         span.html(message);
@@ -73,7 +73,7 @@ class UI {
         setTimeout(() => {
             span.class("ui-text warn");
             span.html("");
-        }, 2000);
+        }, time);
     }
 
     static interval = 60;
