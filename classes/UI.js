@@ -70,10 +70,10 @@ class UI {
         span.class("ui-text warn");
         span.html(message);
 
-        // setTimeout(() => {
-        //     span.class("ui-text warn");
-        //     span.html("");
-        // }, time);
+        setTimeout(() => {
+            span.class("ui-text warn");
+            span.html("");
+        }, time);
     }
 
     static interval = 60;

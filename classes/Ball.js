@@ -39,8 +39,10 @@ class Ball {
         };
 
         this.reposition = function() {
+            this.visiable = true;
             Body.setPosition(this.body, this.initPosition);
             Body.translate(this.body, {x: window.innerWidth / 2, y: window.innerHeight / 2});
+            Body.set(this.body, "isSensor", false);
         }
     }
 

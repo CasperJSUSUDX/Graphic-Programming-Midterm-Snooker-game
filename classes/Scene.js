@@ -138,22 +138,22 @@ class Scene {
             pop();
         }
 
-        this.sinkedList = [];
+        this.sinkedMap = new Map();
         this.sinkCheck = function() {
-            for (let i = 0; i < Ball.balls.length; i++) {
+            for (const ball of Ball.balls) {
                 for (let j = 0; j < this.pocketsPos.length; j++) {
                     if (
                         dist(
-                            Ball.balls[i].body.position.x,
-                            Ball.balls[i].body.position.y,
+                            ball.body.position.x,
+                            ball.body.position.y,
                             this.pocketsPos[j].x,
                             this.pocketsPos[j].y
                         ) < pocketSize
                     ) {
-                        Ball.balls[i].visiable = false;
-                        Body.set(Ball.balls[i], "isSensor", true);
-                        Body.setVelocity(Ball.balls[i].body, {x: 0, y: 0});
-                        this.sinkedList.push(Ball.balls[i]);
+                        ball.visiable = false;
+                        Body.set(ball, "isSensor", true);
+                        Body.setVelocity(ball.body, {x: 0, y: 0});
+                        this.sinkedMap.set(ball.id, ball);
                     }
                 }
             }

@@ -206,18 +206,23 @@ class Cue {
                 });
             }
 
-            async function turnEnd(interval) {
+            async function turnEnd() {
                 setTimeout(() => {
                     return new Promise(() => {
+                        var firstHit = null;
                         console.log("Turn start");
                         const step = () => {
+                            if (firstHit === null) {
+                                Ball.cueBallCollisionCheck();
+                            }
+                            
                             if (!Rule.isAnyBallMoving()) {
-                                Rule.turnEndCheck();
+                                // Rule.turnEndCheck(firstHit);
                                 console.log("Turn end");
                                 return;
                             }
 
-                            setTimeout(step, interval);
+                            setTimeout(step, 1000 / 60);
                         };
 
                         step();
@@ -261,7 +266,7 @@ class Cue {
                 }
                 World.remove(world, collisionSensor);
 
-                turnEnd(20).then(() => {
+                turnEnd().then(() => {
                     pushing = false;
                     positionLock = false;
                     hitWhenPushing = false;

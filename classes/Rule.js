@@ -56,41 +56,58 @@ class Rule {
 
         return false;
     }
-    static turnEndCheck() {
-        switch (this.stage) {
-            case 0:
-                break;
-            case 1:
-                // TODO: consider if some ball sinked before cue ball
-                var inOff = false;
-                var hitWrongBall = false;
-                var maxSocre = 0;
-                for (const ball of scene.sinkedList) {
-                    if (ball.id === "#ffffff") {
-                        inOff = true;
-                    }
-
-                    if (ball.id !== this.selectedColor) {
-                        this.hitOrPottedWrongBall(ball)
-                        console.log("Reposition");
-                        hitWrongBall = true;
-                        ball.reposition();
-                        ball.visiable = true;
-                        Body.set(ball, "isSensor", false);
-                    } else {
-                        UI.addAndUpdateScore(ball.score);
-                        World.remove(world, ball.body);
-                        Ball.balls.splice(Ball.balls.indexOf(ball), 1);
-                    }
-                }
-
-                if (inOff && !hitWrongBall) {
-                    this.pottedCueBall();
-                }
-                break;
-            case 2:
-                break;
+    static turnEndCheck(firstHit) {
+        var inOff = false;
+        var hitWrongBall = new Map([["state", false], ["ball", null]]);
+        var pottedOutOfTarget = new Set();
+        var maxSocre = 0;
+        if (scene.sinkedSet.has("#ffffff")) inOff = true;
+        if (this.selectedColor !== firstHit.id) {
+            hitWrongBall.set("state", true);
+            hitWrongBall.set("ball", firstHit);
         }
+        scene.sinkedMap.forEach((key, value, map) => {
+            if (key !== this.selectedColor) {
+                pottedOutOfTarget.add(value);
+                maxSocre = max(maxSocre, value.score);
+            }
+        });
+
+        if (hitWrongBall.get("state") && pottedOutOfTarget.size > 0) {
+            this.hitOrPottedWrongBall(max(hitWrongBall.get("ball").score, maxSocre));
+        } else if (inOff) {
+            this.pottedCueBall()
+        }
+        /*
+        UI.addAndUpdateScore(ball.score);
+        World.remove(world, ball.body);
+        Ball.balls.splice(Ball.balls.indexOf(ball), 1);
+        */
+       scene.sinkedMap.forEach((key, value, map) => {
+            switch (this.stage) {
+                case 0:
+                    if (inOff || hitWrongBall || pottedOutOfTarget.size > 0) {
+                        console.log("Restart");
+                        // console.log("Reposition");
+                        // this.hitOrPottedWrongBall(value);
+                        // value.reposition();
+                    }
+                    break;
+                case 1:
+                    if ((inOff || hitWrongBall || pottedOutOfTarget.size > 0) && id !== "#ff0000" ) {
+                        console.log("Reposition");                       
+                        value.reposition();
+                    }
+                    break;
+                case 2:
+                    if (inOff || hitWrongBall || pottedOutOfTarget.size > 0) {
+                        console.log("Reposition");
+                        this.hitOrPottedWrongBall(value);
+                        value.reposition();
+                    }
+                    break;
+            }
+        });
         // sinked check
         // collided with wall check
     }

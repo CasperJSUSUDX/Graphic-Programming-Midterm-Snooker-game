@@ -9,6 +9,7 @@ var debugMode = true;
 
 function setup() {
     createCanvas(window.innerWidth, window.innerHeight);
+    frameRate(60);
     background(255);
     rectMode(CENTER);
 
@@ -43,7 +44,7 @@ function setup() {
             tableWidth * 0.014,
             "#563112",
             10,
-            4,
+            2,
             ballSize / 2
         );
 
@@ -80,7 +81,6 @@ function draw() {
 
     scene.sinkCheck();
 
-    Ball.cueBallCollisionCheck();
     Ball.ballCollisionWithWallCheck();
     UI.drawSelectBallArea(Rule.allRedPockected);
 
