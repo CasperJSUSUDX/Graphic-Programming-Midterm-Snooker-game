@@ -47,28 +47,16 @@ class Ball {
     }
 
     static balls = [];
-    static #startDetect = false;
-    static #endDetect = false;
-    static #hadCollision = false;
     static cueBallCollisionCheck() {
         if (this.balls[0].body.speed > 0.01) {
-            this.#startDetect = true;
             for (let i = 1; i < this.balls.length; i++) {
                 var collided = Collision.collides(this.balls[0].body, this.balls[i].body);
                 if (collided) {
-                    Rule.firstCollisionColor(this.balls[i]);
-                    this.#hadCollision = true;
-                    console.log(`${this.balls[0].id} collided with cue ball\n${collided}`);
+                    // Rule.firstCollisionColor(this.balls[i]);
+                    // console.log(`${this.balls[0].id} collided with cue ball\n${collided}`);
+                    return this.balls[i];
                 }
             }
-        } else if (this.#startDetect && !this.#endDetect) {
-            this.#startDetect = false;
-            this.#endDetect = true;
-        }
-
-        if (!this.#startDetect && this.#endDetect && !this.#hadCollision) {
-            Rule.hitOrPottedWrongBall(this.balls[0]);
-            this.#endDetect = false;
         }
     }
 
@@ -82,8 +70,8 @@ class Ball {
             }
             
             if (collided) {
-                console.log(`${this.checkList[i].id} collided with wall`);
-                console.log(collided);
+                // console.log(`${this.checkList[i].id} collided with wall`);
+                // console.log(collided);
                 this.checkList.splice(i, 1);
                 i--;
             }

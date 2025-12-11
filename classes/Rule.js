@@ -61,8 +61,9 @@ class Rule {
         var hitWrongBall = new Map([["state", false], ["ball", null]]);
         var pottedOutOfTarget = new Set();
         var maxSocre = 0;
-        if (scene.sinkedSet.has("#ffffff")) inOff = true;
-        if (this.selectedColor !== firstHit.id) {
+        // TODO: Consider fail to hit cue ball
+        if (scene.sinkedMap.has("#ffffff")) inOff = true;
+        if (firstHit.id !== (this.selectedColor || "#ff0000")) {
             hitWrongBall.set("state", true);
             hitWrongBall.set("ball", firstHit);
         }
@@ -83,31 +84,35 @@ class Rule {
         World.remove(world, ball.body);
         Ball.balls.splice(Ball.balls.indexOf(ball), 1);
         */
-       scene.sinkedMap.forEach((key, value, map) => {
-            switch (this.stage) {
-                case 0:
-                    if (inOff || hitWrongBall || pottedOutOfTarget.size > 0) {
-                        console.log("Restart");
-                        // console.log("Reposition");
-                        // this.hitOrPottedWrongBall(value);
-                        // value.reposition();
-                    }
+        switch (this.stage) {
+            case 0:
+                if (inOff || hitWrongBall.get("state") || pottedOutOfTarget.size > 0) {
+                    console.log(inOff, hitWrongBall.get("state"), pottedOutOfTarget.size)
+                    UI.updateProgressSpan("Restart")
+                    this.selectedCueBallInitPos = false;
+                    this.allRedPockected = false;
+                    this.previousHitColor = null;
+                    this.selectedColor = null;
+                    for (const ball of Ball.balls) ball.reposition();
                     break;
-                case 1:
-                    if ((inOff || hitWrongBall || pottedOutOfTarget.size > 0) && id !== "#ff0000" ) {
-                        console.log("Reposition");                       
-                        value.reposition();
-                    }
-                    break;
-                case 2:
-                    if (inOff || hitWrongBall || pottedOutOfTarget.size > 0) {
-                        console.log("Reposition");
-                        this.hitOrPottedWrongBall(value);
-                        value.reposition();
-                    }
-                    break;
-            }
-        });
+                }
+
+                this.stage = 1;
+                break;
+            case 1:
+                if ((inOff || hitWrongBall.get("state") || pottedOutOfTarget.size > 0) && id !== "#ff0000" ) {
+                    console.log("Reposition");                       
+                    value.reposition();
+                }
+                break;
+            case 2:
+                if (inOff || hitWrongBall.get("state") || pottedOutOfTarget.size > 0) {
+                    console.log("Reposition");
+                    this.hitOrPottedWrongBall(value);
+                    value.reposition();
+                }
+                break;
+        }
         // sinked check
         // collided with wall check
     }
@@ -123,16 +128,16 @@ class Rule {
     // Foul response
     static failToHitCueBall(score = 0) {
         UI.addAndUpdateScore(-max(4, score));
-        UI.updateProgressSpan("Foul: Didn't hit cue ball.", 2000);
+        UI.updateProgressSpan("Foul: Didn't hit cue ball.");
     }
     static pottedCueBall() {
         // TODO: Fix cue ball will sink multiple times bug
-        UI.updateProgressSpan("Foul: Cue ball in pocket.", 2000);
+        UI.updateProgressSpan("Foul: Cue ball in pocket.");
         UI.addAndUpdateScore(-4);
         console.log("Please select a place.");
     }
     static hitOrPottedWrongBall(ball) {
-        UI.updateProgressSpan("Foul: Hitted or Potted wrong color.", 2000);
+        UI.updateProgressSpan("Foul: Hitted or Potted wrong color.");
         UI.addAndUpdateScore(-max(ball.score, 4));
     }
     static missTouching() {

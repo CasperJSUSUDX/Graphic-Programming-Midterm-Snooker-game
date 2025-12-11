@@ -81,7 +81,6 @@ function draw() {
 
     scene.sinkCheck();
 
-    Ball.ballCollisionWithWallCheck();
     UI.drawSelectBallArea(Rule.allRedPockected);
 
     if (debugMode) {

@@ -34,46 +34,66 @@ class UI {
     static #score = 0;
     static createScoreText() {
         const scoreUI = createSpan(`Score: ${this.#score}`);
-        scoreUI.id("score-text")
+        scoreUI.id("score-text");
         scoreUI.class("ui-text");
         scoreUI.parent("ui");
     }
     static addAndUpdateScore(num) {
         this.#score += num;
+        select("#score-text").html(`Score: ${this.#score}`);
+    }
+    static scoreReset() {
+        this.#score = 0;
         select("#score-text").html(`Score: ${this.#score}`)
     }
 
+    static #updateList = [];
     static createProgressText() {
         const container = createDiv();
         container.style("display", "flex");
         container.style("flex-direction", "column");
-        // container.style("align-items", "center");
         container.style("position", "absolute");
         container.style("left", `${window.innerWidth / 2 - 200}px`);
         container.style("top", "0");
 
         const stageSpan = createSpan("Stage: 0 - Break shot");
-        // stageSpan.style("text-align", "center");
         stageSpan.style("font-size", "4vh");
         stageSpan.class("ui-text");
         stageSpan.parent(container);
 
         const messageSpan = createSpan("");
         messageSpan.id("ui-message");
-        // messageSpan.style("text-align", "center");
         messageSpan.style("font-size", "3vh");
         messageSpan.class("ui-text");
         messageSpan.parent(container);
     }
-    static updateProgressSpan(message, time) {
-        const span = select("#ui-message");
-        span.class("ui-text warn");
-        span.html(message);
+    static async updateProgressSpan(message, time = 2000) {
+        this.#updateList.push({
+            message: message,
+            time: time
+        })
 
-        setTimeout(() => {
-            span.class("ui-text warn");
-            span.html("");
-        }, time);
+        return new Promise((resolve) => {
+            const processNext = () => {
+                const span = select("#ui-message");
+
+                if (this.#updateList.length === 0) {
+                    span.html("");
+                    span.class("ui-text");
+                    resolve();
+                    return;
+                }
+
+                span.class("ui-text warn");
+                span.html(this.#updateList[0].message);
+                var interval = this.#updateList[0].time;
+                this.#updateList.splice(0, 1);
+
+                setTimeout(processNext, interval);
+            }
+            
+            processNext();
+        });
     }
 
     static interval = 60;

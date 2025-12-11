@@ -208,21 +208,21 @@ class Cue {
 
             async function turnEnd() {
                 setTimeout(() => {
-                    return new Promise(() => {
-                        var firstHit = null;
-                        console.log("Turn start");
+                    return new Promise((resolve) => {
+                        var firstHit;
+                        // console.log("Turn start");
                         const step = () => {
-                            if (firstHit === null) {
-                                Ball.cueBallCollisionCheck();
-                            }
-                            
+                            if (firstHit === undefined) firstHit = Ball.cueBallCollisionCheck();
+                            Ball.ballCollisionWithWallCheck();
                             if (!Rule.isAnyBallMoving()) {
-                                // Rule.turnEndCheck(firstHit);
-                                console.log("Turn end");
+                                Ball.checkList = [];
+                                Rule.turnEndCheck(firstHit);
+                                // console.log("Turn end");
+                                resolve();
                                 return;
                             }
 
-                            setTimeout(step, 1000 / 60);
+                            setTimeout(step, 20);
                         };
 
                         step();
