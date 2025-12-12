@@ -115,6 +115,16 @@ class Cue {
             }
         }
 
+        this.switchLayer = function() {
+            if (body.collisionFilter.category = SCENE) {
+                body.collisionFilter.category = PLAYER;
+                body.collisionFilter.mask = PLAYER;
+            } else {
+                body.collisionFilter.category = SCENE;
+                body.collisionFilter.mask = SCENE;
+            } 
+        }
+
         this.adjustSpeed = function (num) {
             speed = num;
         }
@@ -228,15 +238,8 @@ class Cue {
                     }
                 }
                 if (hitBall) {
-                    if (hitBall.id !== "#ffffff") {
-                        Rule.failToHitCueBall(hitBall.score);
-                    } else if (Rule.stage === 0) {
-                        for (const ball of Ball.balls) {
-                            if (ball.id === "#ff0000") {
-                                Ball.checkList.push(ball);
-                            }
-                        }
-                    }
+                    if (hitBall.id !== "#ffffff") Rule.failToHitCueBall(hitBall.score);
+                    else if (Rule.stage === 0) Ball.registerCheckList(Ball.balls.filter(e => e.id === "#ff0000"));
                 } else {
                     Rule.failToHitCueBall();
                 }
@@ -250,8 +253,6 @@ class Cue {
             positionLock = false;
             hitWhenPushing = false;
             rotationLock = false;
-            body.collisionFilter.category = PLAYER;
-            body.collisionFilter.mask = PLAYER;
         }
 
         // debug use

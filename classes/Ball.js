@@ -55,23 +55,37 @@ class Ball {
             }
         }
 
-        return undefined;
+        return {
+            id: "undefined",
+            score: -4
+        };
     }
 
-    static checkList = [];
+    static #checkList = [];
+    static #startLength;
     static ballCollisionWithWallCheck() {
-        for (let i = 0; i < this.checkList.length; i++) {
+        for (let i = 0; i < this.#checkList.length; i++) {
             var collided = null;
             for (let j = 1; j < scene.body.parts.length; j++) {
-                collided = Collision.collides(this.checkList[i].body, scene.body.parts[j]);
+                collided = Collision.collides(this.#checkList[i].body, scene.body.parts[j]);
                 if (collided) break;
             }
             
             if (collided) {
-                this.checkList.splice(i, 1);
+                this.#checkList.splice(i, 1);
                 i--;
             }
         }
+    }
+    static registerCheckList(arr) {
+        this.#checkList = [...arr];
+        this.#startLength = this.#checkList.length;
+    }
+    static checkListWasDecreaseAndClear() {
+        const l = this.#checkList.length;
+        this.#checkList = [];
+        if (l !== this.#startLength) return true;
+        return false;
     }
 
     static selectPosInDZone(cueBall) {

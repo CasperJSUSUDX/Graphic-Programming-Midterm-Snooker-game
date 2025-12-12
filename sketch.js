@@ -81,7 +81,7 @@ function draw() {
 
     scene.sinkCheck();
 
-    UI.drawSelectBallArea(Rule.allRedPockected);
+    UI.drawSelectBallArea(Rule.redWasPotted);
 
     if (Rule.turnProcessing) Rule.turnProcess();
 
@@ -92,16 +92,23 @@ function draw() {
 }
 
 function mousePressed() {
-    cue.pushStart();
-    Rule.selectColorBall();
+    if (!Rule.turnProcessing) {
+        cue.pushStart();
+        Rule.selectColorBall();
+    }
+        
 }
 
 function mouseDragged() {
-    cue.pushProcess();
+    if (!Rule.turnProcessing) {
+        cue.pushProcess();
+    }
 }
 
 async function mouseReleased() {
-    cue.pushEnd();
+    if (!Rule.turnProcessing) {
+        cue.pushEnd();
+    }
 }
 
 function keyPressed() {
