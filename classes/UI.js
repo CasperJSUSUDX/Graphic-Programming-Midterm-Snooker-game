@@ -59,6 +59,7 @@ class UI {
         const stageSpan = createSpan("Stage: 0 - Break shot");
         stageSpan.style("font-size", "4vh");
         stageSpan.class("ui-text");
+        stageSpan.id("stage-text");
         stageSpan.parent(container);
 
         const messageSpan = createSpan("");
@@ -66,6 +67,23 @@ class UI {
         messageSpan.style("font-size", "3vh");
         messageSpan.class("ui-text");
         messageSpan.parent(container);
+    }
+    static changeStageSpan(stage) {
+        const span = select("#stage-text");
+        switch (stage) {
+            case 0:
+                span.html("Stage: 0 - Break shot");
+                break;
+            case 1:
+                span.html("Stage: 1 - Reds and Colors");
+                break;
+            case 2:
+                span.html("Stage: 2 - Clearing the Colors");
+                break;
+            default:
+                span.html("Stage: 0 - Break shot");
+                break;
+        }
     }
     static async updateProgressSpan(message, time = 2000) {
         this.#updateList.push({
@@ -98,7 +116,6 @@ class UI {
 
     static interval = 60;
     static circleSize = 50;
-    // TODO: Finish color order rerender after sellect color
     static colorMap = new Map([
         ["#ff0000", true],
         ["#ffff00", false],
@@ -128,20 +145,33 @@ class UI {
     }
 
     static resetColorMap() {
-        this.colorMap.forEach((value, key) => {
-            if (!Rule.redWasPotted) {
-                if (key === "#ff0000") {
-                    this.colorMap.set(key, true);
-                } else {
-                    this.colorMap.set(key, false);
-                }
-            } else {
-                if (key === "#ff0000") {
-                    this.colorMap.set(key, false);
-                } else {
-                    this.colorMap.set(key, true);
-                }
-            }
-        })
+        switch (Rule.stage) {
+            case 2:
+                this.colorMap.forEach((value, key) => {
+                    if (key === "#ff0000") {
+                        this.colorMap.set(key, false);
+                    } else {
+                        this.colorMap.set(key, true);
+                    }
+                });
+                break;
+            default:
+                this.colorMap.forEach((value, key) => {
+                    if (!Rule.redWasPotted) {
+                        if (key === "#ff0000") {
+                            this.colorMap.set(key, true);
+                        } else {
+                            this.colorMap.set(key, false);
+                        }
+                    } else {
+                        if (key === "#ff0000") {
+                            this.colorMap.set(key, false);
+                        } else {
+                            this.colorMap.set(key, true);
+                        }
+                    }
+                });
+                break;
+        }
     }
 }

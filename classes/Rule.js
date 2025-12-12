@@ -2,7 +2,7 @@ class Rule {
     // 1 for starting position, 2 for ramdom position(only red balls), 3 for random position(red balls and colors)
     static mode = 1;
     // stage 0: break shoot, stage 1: red and color ball in turn, stage 2: color order
-    static stage = 1;
+    static stage = 0;
     static selectedCueBallInitPos = false;
     static redWasPotted = false;
     static previousPotColor = null;
@@ -89,9 +89,15 @@ class Rule {
                     break;
                 }
 
-                this.stage = 1;
+                this.stage++;
+                UI.changeStageSpan(this.stage);
                 break;
             case 1:
+                if (!Ball.balls.find((ball) => ball.id === "#ff0000") && this.redWasPotted) {
+                    this.stage++;
+                    UI.changeStageSpan(this.stage);
+                }
+
                 scene.sinkedMap.forEach((value, key) => {
                     if (foul) {
                         if (key !== "#ff0000") {
@@ -107,6 +113,10 @@ class Rule {
                         Ball.balls.splice(index, 1);   
                     }
                 });
+
+                if (scene.sinkedMap.size === 0) {
+                    this.redWasPotted = false;
+                }
                 break;
             case 2:
                 if (inOff || hitWrongBall || pottedOutOfTarget.size > 0) {
