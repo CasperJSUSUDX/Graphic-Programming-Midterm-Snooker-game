@@ -44,7 +44,7 @@ function setup() {
             tableWidth * 0.014,
             "#563112",
             10,
-            2,
+            tableLength / 307.65,
             ballSize / 2
         );
 

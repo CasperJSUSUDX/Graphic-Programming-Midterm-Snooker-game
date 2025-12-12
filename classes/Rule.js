@@ -60,6 +60,7 @@ class Rule {
         var inOff = false;
         var hitWrongBall = new Map([["state", false], ["ball", null]]);
         var pottedOutOfTarget = new Set();
+        var foul = false;
         var maxSocre = 0;
         // TODO: Consider fail to hit cue ball
         if (scene.sinkedMap.has("#ffffff")) inOff = true;
@@ -67,7 +68,7 @@ class Rule {
             hitWrongBall.set("state", true);
             hitWrongBall.set("ball", firstHit);
         }
-        scene.sinkedMap.forEach((key, value, map) => {
+        scene.sinkedMap.forEach((key, value) => {
             if (key !== this.selectedColor) {
                 pottedOutOfTarget.add(value);
                 maxSocre = max(maxSocre, value.score);
@@ -76,18 +77,15 @@ class Rule {
 
         if (hitWrongBall.get("state") && pottedOutOfTarget.size > 0) {
             this.hitOrPottedWrongBall(max(hitWrongBall.get("ball").score, maxSocre));
+            foul = true;
         } else if (inOff) {
             this.pottedCueBall()
+            foul = true;
         }
-        /*
-        UI.addAndUpdateScore(ball.score);
-        World.remove(world, ball.body);
-        Ball.balls.splice(Ball.balls.indexOf(ball), 1);
-        */
+
         switch (this.stage) {
             case 0:
-                if (inOff || hitWrongBall.get("state") || pottedOutOfTarget.size > 0) {
-                    console.log(inOff, hitWrongBall.get("state"), pottedOutOfTarget.size)
+                if (foul) {
                     UI.updateProgressSpan("Restart")
                     this.selectedCueBallInitPos = false;
                     this.allRedPockected = false;
@@ -100,10 +98,17 @@ class Rule {
                 this.stage = 1;
                 break;
             case 1:
-                if ((inOff || hitWrongBall.get("state") || pottedOutOfTarget.size > 0) && id !== "#ff0000" ) {
-                    console.log("Reposition");                       
-                    value.reposition();
-                }
+                scene.sinkedMap.forEach((key, value, map) => {
+                    if (foul) {
+                        if (key !== "#ff0000") {
+                            value.reposition();
+                        }
+                    } else {
+                        World.remove(world, value.body);
+                        const index = Ball.balls.indexOf(value);
+                        Ball.balls.splice(index, 1);
+                    }
+                });
                 break;
             case 2:
                 if (inOff || hitWrongBall.get("state") || pottedOutOfTarget.size > 0) {
