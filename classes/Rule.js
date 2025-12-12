@@ -57,9 +57,10 @@ class Rule {
         var maxSocre = 0;
         cue.switchLayer();
         if (scene.sinkedMap.has("#ffffff")) inOff = true;
+        console.log(this.#firstHit);
         if (this.#firstHit.id !== (this.selectedColor || "#ff0000")) hitWrongBall = true;
         scene.sinkedMap.forEach((value, key) => {
-            if (key !== (this.selectedColor || "#ffffff")) {
+            if (key !== (this.selectedColor || "#ff0000" || "#ffffff")) {
                 pottedOutOfTarget.add(value);
                 maxSocre = max(maxSocre, value.score);
             }
@@ -98,6 +99,8 @@ class Rule {
                         const index = Ball.balls.indexOf(value);
                         this.previousPotColor = value.id
                         if (value.id === "#ff0000") this.redWasPotted = true;
+                        else this.redWasPotted = false;
+                        UI.addAndUpdateScore(value.score);
                         World.remove(world, value.body);
                         Ball.balls.splice(index, 1);   
                     }
@@ -113,6 +116,12 @@ class Rule {
         }
         
         cue.unlock();
+        scene.sinkedMap = new Map();
+        this.selectedColor = null;
+        this.#firstHit = {
+            id: "undefined",
+            score: -4
+        };
         this.turnProcessing = false;
     }
 

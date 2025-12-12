@@ -172,7 +172,9 @@ class Ball {
             case 3:
                 break;
             case "debug":
-                
+                this.balls.push(new Ball({ x: 0, y: 0 }, "#ffffff"));
+                this.balls.push(new Ball({ x: 0, y: tableWidth / 2 - 50 }, "#ff0000"));
+                this.balls.push(new Ball({ x: tableLength / 2 - 50, y: tableWidth / 2 - 50 }, "#000000", 7));
                 break;
         }
 
