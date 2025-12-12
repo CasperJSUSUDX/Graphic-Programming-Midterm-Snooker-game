@@ -120,5 +120,3 @@ function keyPressed() {
         }
     }
 }
-
-function chooseColor(target) {}
