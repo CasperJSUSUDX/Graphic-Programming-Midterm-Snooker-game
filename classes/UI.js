@@ -98,6 +98,7 @@ class UI {
 
     static interval = 60;
     static circleSize = 50;
+    // TODO: Finish color order rerender after sellect color
     static colorOrder = [
         "#ff0000",
         "#ffff00",
