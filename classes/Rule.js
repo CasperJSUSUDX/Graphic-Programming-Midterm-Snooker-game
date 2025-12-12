@@ -8,6 +8,7 @@ class Rule {
     static previousPotColor = null;
     static selectedColor = "#ff0000";
     
+    // TODO: Add an hit order when stage 2;
     static selectColorBall() {
         if (!this.selectedColor) {
             var selected = false;
@@ -29,7 +30,6 @@ class Rule {
                     else UI.colorMap.set(key, false);
                 })
             }
-            
         }
     }
     static isAnyBallMoving() {
