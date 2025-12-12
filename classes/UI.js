@@ -99,33 +99,49 @@ class UI {
     static interval = 60;
     static circleSize = 50;
     // TODO: Finish color order rerender after sellect color
-    static colorOrder = [
-        "#ff0000",
-        "#ffff00",
-        "#00ff00",
-        "#784315",
-        "#0000ff",
-        "#EF88BE",
-        "#000000",
-    ];
-    static drawSelectBallArea(redWasPockected) {
+    static colorMap = new Map([
+        ["#ff0000", true],
+        ["#ffff00", false],
+        ["#00ff00", false],
+        ["#784315", false],
+        ["#0000ff", false],
+        ["#EF88BE", false],
+        ["#000000", false]
+    ]);
+
+    static drawSelectBallArea() {
         push();
-        for (let i = 0; i < this.colorOrder.length; i++) {
-            var color = this.colorOrder[i];
+        var index = 1;
+        this.colorMap.forEach((value, key) => {
+            var hexColor = key;
+            if (!value) hexColor += "40";
 
-            if (redWasPockected && color.match(/^#ff0000$/g)) {
-                color += "40";
-            } else if (!redWasPockected && !color.match(/(^#ff0000$)|(40$)/g)) {
-                color += "40";
-            }
-
-            fill(color);
+            fill(hexColor);
             ellipse(
-                window.innerWidth - this.interval - (this.colorOrder.length - 1 - i) * this.interval,
+                window.innerWidth - (this.colorMap.size + 1 - index) * this.interval,
                 this.interval,
                 this.circleSize
             );
-        }
+            index++;
+        });
         pop();
+    }
+
+    static resetColorMap() {
+        this.colorMap.forEach((value, key) => {
+            if (!Rule.redWasPotted) {
+                if (key === "#ff0000") {
+                    this.colorMap.set(key, true);
+                } else {
+                    this.colorMap.set(key, false);
+                }
+            } else {
+                if (key === "#ff0000") {
+                    this.colorMap.set(key, false);
+                } else {
+                    this.colorMap.set(key, true);
+                }
+            }
+        })
     }
 }

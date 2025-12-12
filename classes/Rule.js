@@ -6,27 +6,30 @@ class Rule {
     static selectedCueBallInitPos = false;
     static redWasPotted = false;
     static previousPotColor = null;
-    static selectedColor = null;
-    static colors = UI.colorOrder;
+    static selectedColor = "#ff0000";
     
     static selectColorBall() {
         if (!this.selectedColor) {
-            for (let i = 0; i < this.colors.length; i++) {
-                if (
-                    dist(
-                        mouseX,
-                        mouseY,
-                        window.innerWidth - UI.interval - (this.colors.length - 1 - i) * UI.interval,
-                        UI.interval
-                    ) <= UI.circleSize
-                ) {
-                    if (this.colors[i].match(/40$/gm)) {
-                        break;
-                    } else {
-                        this.selectedColor =  this.colors[i];
-                    }
+            var selected = false;
+            var index = 1;
+            for (const [key, value] of UI.colorMap.entries()) {
+                const x = window.innerWidth - (UI.colorMap.size + 1 - index) * UI.interval;
+                const y = UI.interval;
+                if (dist(mouseX, mouseY, x, y) <= UI.circleSize / 2) {
+                    this.selectedColor = key;
+                    selected = true;
+                    break;
                 }
+                index++;
             }
+
+            if (selected) {
+                UI.colorMap.forEach((value, key) => {
+                    if (key === this.selectedColor) UI.colorMap.set(key, true);
+                    else UI.colorMap.set(key, false);
+                })
+            }
+            
         }
     }
     static isAnyBallMoving() {
@@ -57,7 +60,6 @@ class Rule {
         var maxSocre = 0;
         cue.switchLayer();
         if (scene.sinkedMap.has("#ffffff")) inOff = true;
-        console.log(this.#firstHit);
         if (this.#firstHit.id !== (this.selectedColor || "#ff0000")) hitWrongBall = true;
         scene.sinkedMap.forEach((value, key) => {
             if (key !== (this.selectedColor || "#ff0000" || "#ffffff")) {
@@ -117,6 +119,7 @@ class Rule {
         
         cue.unlock();
         scene.sinkedMap = new Map();
+        UI.resetColorMap();
         this.selectedColor = null;
         this.#firstHit = {
             id: "undefined",
