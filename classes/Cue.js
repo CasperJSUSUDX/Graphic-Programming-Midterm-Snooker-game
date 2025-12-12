@@ -115,6 +115,16 @@ class Cue {
             }
         }
 
+        this.switchLayer = function() {
+            if (body.collisionFilter.category = SCENE) {
+                body.collisionFilter.category = PLAYER;
+                body.collisionFilter.mask = PLAYER;
+            } else {
+                body.collisionFilter.category = SCENE;
+                body.collisionFilter.mask = SCENE;
+            } 
+        }
+
         this.adjustSpeed = function (num) {
             speed = num;
         }
@@ -206,35 +216,6 @@ class Cue {
                 });
             }
 
-            async function turnEnd() {
-                setTimeout(() => {
-                    // BUG: Sometime turn will end in a random moment
-                    // This bug might because the update rate of the draw and thie promise are different 
-                    return new Promise((resolve) => {
-                        var firstHit;
-                        console.log("Turn start");
-                        const step = () => {
-                            if (firstHit === undefined) {
-                                firstHit = Ball.cueBallCollisionCheck();
-                                if (firstHit) console.log(firstHit);
-                            }
-                            Ball.ballCollisionWithWallCheck();
-                            if (!Rule.isAnyBallMoving()) {
-                                Ball.checkList = [];
-                                Rule.turnEndCheck(firstHit);
-                                console.log("Turn end");
-                                resolve();
-                                return;
-                            }
-
-                            setTimeout(step, 20);
-                        };
-
-                        step();
-                    });
-                }, 10);
-            }
-
             if (pushing && positionLock) {
                 var pushEndPos = createVector(mouseX, mouseY);
                 var moveLength = min(300, pushEndPos.sub(pushStartPos).mag());
@@ -257,29 +238,21 @@ class Cue {
                     }
                 }
                 if (hitBall) {
-                    if (hitBall.id !== "#ffffff") {
-                        Rule.failToHitCueBall(hitBall.score);
-                    } else if (Rule.stage === 0) {
-                        for (const ball of Ball.balls) {
-                            if (ball.id === "#ff0000") {
-                                Ball.checkList.push(ball);
-                            }
-                        }
-                    }
+                    if (hitBall.id !== "#ffffff") Rule.failToHitCueBall(hitBall.score);
+                    else if (Rule.stage === 0) Ball.registerCheckList(Ball.balls.filter(e => e.id === "#ff0000"));
                 } else {
                     Rule.failToHitCueBall();
                 }
                 World.remove(world, collisionSensor);
-
-                turnEnd().then(() => {
-                    pushing = false;
-                    positionLock = false;
-                    hitWhenPushing = false;
-                    rotationLock = false;
-                    body.collisionFilter.category = PLAYER;
-                    body.collisionFilter.mask = PLAYER;
-                });
+                Rule.turnProcessing = true;
             }
+        }
+
+        this.unlock = function() {
+            pushing = false;
+            positionLock = false;
+            hitWhenPushing = false;
+            rotationLock = false;
         }
 
         // debug use

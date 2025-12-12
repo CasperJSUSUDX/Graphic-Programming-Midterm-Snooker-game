@@ -55,25 +55,37 @@ class Ball {
             }
         }
 
-        return undefined;
+        return {
+            id: "undefined",
+            score: -4
+        };
     }
 
-    static checkList = [];
+    static #checkList = [];
+    static #startLength;
     static ballCollisionWithWallCheck() {
-        for (let i = 0; i < this.checkList.length; i++) {
+        for (let i = 0; i < this.#checkList.length; i++) {
             var collided = null;
             for (let j = 1; j < scene.body.parts.length; j++) {
-                collided = Collision.collides(this.checkList[i].body, scene.body.parts[j]);
+                collided = Collision.collides(this.#checkList[i].body, scene.body.parts[j]);
                 if (collided) break;
             }
             
             if (collided) {
-                // console.log(`${this.checkList[i].id} collided with wall`);
-                // console.log(collided);
-                this.checkList.splice(i, 1);
+                this.#checkList.splice(i, 1);
                 i--;
             }
         }
+    }
+    static registerCheckList(arr) {
+        this.#checkList = [...arr];
+        this.#startLength = this.#checkList.length;
+    }
+    static checkListWasDecreaseAndClear() {
+        const l = this.#checkList.length;
+        this.#checkList = [];
+        if (l !== this.#startLength) return true;
+        return false;
     }
 
     static selectPosInDZone(cueBall) {
@@ -119,5 +131,52 @@ class Ball {
         Body.set(cueBall.body, "isSensor", false);
 
         return true;
+    }
+
+    static initBalls(mode = 1) {
+        switch (mode) {
+            case 1:
+                // cue ball
+                this.balls.push(new Ball({ x: -tableLength * 0.35, y: 0 }, "#ffffff"));
+                // yellow ball
+                this.balls.push(
+                    new Ball({ x: -tableLength * 0.3, y: tableWidth / 6 }, "#ffff00", 2)
+                );
+                // browen ball
+                this.balls.push(new Ball({ x: -tableLength * 0.3, y: 0 }, "#784315", 4));
+                // green ball
+                this.balls.push(
+                    new Ball({ x: -tableLength * 0.3, y: -tableWidth / 6 }, "#00ff00", 3)
+                );
+                // blue ball
+                this.balls.push(new Ball({ x: 0, y: 0 }, "#0000ff", 5));
+                // pink
+                this.balls.push(new Ball({ x: tableLength / 4, y: 0 }, "#EF88BE", 6));
+                // black ball
+                this.balls.push(new Ball({ x: (tableLength * 9) / 22, y: 0 }, "#000000", 7));
+                // red balls
+                for (let i = 0; i < 5; i++) {
+                    var basicPosY = (ballSize / 2) * i;
+                    for (let j = 0; j <= i; j++) {
+                        this.balls.push(
+                            new Ball(
+                                { x: tableLength / 4 + ballSize * (i + 1), y: basicPosY - ballSize * j },
+                                "#ff0000"
+                            )
+                        );
+                    }
+                }
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            case "debug":
+                this.balls.push(new Ball({ x: 0, y: 0 }, "#ffffff"));
+                this.balls.push(new Ball({ x: 0, y: tableWidth / 2 - 50 }, "#ff0000"));
+                this.balls.push(new Ball({ x: tableLength / 2 - 50, y: tableWidth / 2 - 50 }, "#000000", 7));
+                break;
+        }
+
     }
 }
