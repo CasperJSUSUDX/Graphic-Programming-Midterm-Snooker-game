@@ -68,8 +68,6 @@ class Ball {
             }
             
             if (collided) {
-                // console.log(`${this.checkList[i].id} collided with wall`);
-                // console.log(collided);
                 this.checkList.splice(i, 1);
                 i--;
             }

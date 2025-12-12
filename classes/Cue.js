@@ -206,35 +206,6 @@ class Cue {
                 });
             }
 
-            async function turnEnd() {
-                setTimeout(() => {
-                    // BUG: Sometime turn will end in a random moment
-                    // This bug might because the update rate of the draw and thie promise are different 
-                    return new Promise((resolve) => {
-                        var firstHit;
-                        console.log("Turn start");
-                        const step = () => {
-                            if (firstHit === undefined) {
-                                firstHit = Ball.cueBallCollisionCheck();
-                                if (firstHit) console.log(firstHit);
-                            }
-                            Ball.ballCollisionWithWallCheck();
-                            if (!Rule.isAnyBallMoving()) {
-                                Ball.checkList = [];
-                                Rule.turnEndCheck(firstHit);
-                                console.log("Turn end");
-                                resolve();
-                                return;
-                            }
-
-                            setTimeout(step, 20);
-                        };
-
-                        step();
-                    });
-                }, 10);
-            }
-
             if (pushing && positionLock) {
                 var pushEndPos = createVector(mouseX, mouseY);
                 var moveLength = min(300, pushEndPos.sub(pushStartPos).mag());
@@ -270,16 +241,17 @@ class Cue {
                     Rule.failToHitCueBall();
                 }
                 World.remove(world, collisionSensor);
-
-                turnEnd().then(() => {
-                    pushing = false;
-                    positionLock = false;
-                    hitWhenPushing = false;
-                    rotationLock = false;
-                    body.collisionFilter.category = PLAYER;
-                    body.collisionFilter.mask = PLAYER;
-                });
+                Rule.turnProcessing = true;
             }
+        }
+
+        this.unlock = function() {
+            pushing = false;
+            positionLock = false;
+            hitWhenPushing = false;
+            rotationLock = false;
+            body.collisionFilter.category = PLAYER;
+            body.collisionFilter.mask = PLAYER;
         }
 
         // debug use

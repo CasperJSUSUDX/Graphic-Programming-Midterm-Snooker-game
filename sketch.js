@@ -83,6 +83,8 @@ function draw() {
 
     UI.drawSelectBallArea(Rule.allRedPockected);
 
+    if (Rule.turnProcessing) Rule.turnProcess();
+
     if (debugMode) {
         drawMousePos();
         cue.drawHitArea();

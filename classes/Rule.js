@@ -56,22 +56,29 @@ class Rule {
 
         return false;
     }
-    static turnEndCheck(firstHit) {
+    
+    static turnProcessing = false;
+    static #firstHit = undefined;
+    static turnProcess() {
+        if (this.#firstHit === undefined) this.#firstHit = Ball.cueBallCollisionCheck();
+        Ball.ballCollisionWithWallCheck();
+        if (!this.isAnyBallMoving()) this.#turnEnd();
+    }
+    static #turnEnd() {
         var inOff = false;
-        var hitWrongBall = new Map([["state", false], ["ball", null]]);
+        var hitWrongBall = false;
         var pottedOutOfTarget = new Set();
         var foul = false;
         var maxSocre = 0;
-        if (firstHit === undefined) {
+        Ball.checkList = [];
+        if (this.#firstHit === undefined) {
             Rule.hitOrPottedWrongBall({score: -4});
+            cue.unlock();
+            this.turnProcessing = false;
             return;
         }
         if (scene.sinkedMap.has("#ffffff")) inOff = true;
-        console.log(firstHit.id !== (this.selectedColor || "#ff0000"));
-        if (firstHit.id !== (this.selectedColor || "#ff0000")) {
-            hitWrongBall.set("state", true);
-            hitWrongBall.set("ball", firstHit);
-        }
+        if (this.#firstHit.id !== (this.selectedColor || "#ff0000")) hitWrongBall = true;
         scene.sinkedMap.forEach((key, value) => {
             if (key !== this.selectedColor) {
                 pottedOutOfTarget.add(value);
@@ -79,8 +86,8 @@ class Rule {
             }
         });
 
-        if (hitWrongBall.get("state") || pottedOutOfTarget.size > 0) {
-            this.hitOrPottedWrongBall(max(hitWrongBall.get("ball").score, maxSocre));
+        if (hitWrongBall || pottedOutOfTarget.size > 0) {
+            this.hitOrPottedWrongBall(max(this.#firstHit.score, maxSocre));
             foul = true;
         } else if (inOff) {
             this.pottedCueBall()
@@ -116,15 +123,16 @@ class Rule {
                 });
                 break;
             case 2:
-                if (inOff || hitWrongBall.get("state") || pottedOutOfTarget.size > 0) {
+                if (inOff || hitWrongBall || pottedOutOfTarget.size > 0) {
                     console.log("Reposition");
                     this.hitOrPottedWrongBall(value);
                     value.reposition();
                 }
                 break;
         }
-        // sinked check
-        // collided with wall check
+        
+        cue.unlock();
+        this.turnProcessing = false;
     }
 
     // Foul response
