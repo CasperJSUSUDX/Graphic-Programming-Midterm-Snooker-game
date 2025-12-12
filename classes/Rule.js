@@ -62,8 +62,12 @@ class Rule {
         var pottedOutOfTarget = new Set();
         var foul = false;
         var maxSocre = 0;
-        // TODO: Consider fail to hit cue ball
+        if (firstHit === undefined) {
+            Rule.hitOrPottedWrongBall({score: -4});
+            return;
+        }
         if (scene.sinkedMap.has("#ffffff")) inOff = true;
+        console.log(firstHit.id !== (this.selectedColor || "#ff0000"));
         if (firstHit.id !== (this.selectedColor || "#ff0000")) {
             hitWrongBall.set("state", true);
             hitWrongBall.set("ball", firstHit);
@@ -75,7 +79,7 @@ class Rule {
             }
         });
 
-        if (hitWrongBall.get("state") && pottedOutOfTarget.size > 0) {
+        if (hitWrongBall.get("state") || pottedOutOfTarget.size > 0) {
             this.hitOrPottedWrongBall(max(hitWrongBall.get("ball").score, maxSocre));
             foul = true;
         } else if (inOff) {
@@ -86,6 +90,7 @@ class Rule {
         switch (this.stage) {
             case 0:
                 if (foul) {
+                    UI.scoreReset();
                     UI.updateProgressSpan("Restart")
                     this.selectedCueBallInitPos = false;
                     this.allRedPockected = false;
@@ -104,8 +109,8 @@ class Rule {
                             value.reposition();
                         }
                     } else {
-                        World.remove(world, value.body);
                         const index = Ball.balls.indexOf(value);
+                        World.remove(world, value.body);
                         Ball.balls.splice(index, 1);
                     }
                 });

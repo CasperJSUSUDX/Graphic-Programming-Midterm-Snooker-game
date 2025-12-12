@@ -54,6 +54,8 @@ class Ball {
                 if (collided) return this.balls[i];
             }
         }
+
+        return undefined;
     }
 
     static checkList = [];

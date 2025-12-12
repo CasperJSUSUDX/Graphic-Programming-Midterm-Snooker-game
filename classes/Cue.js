@@ -208,16 +208,21 @@ class Cue {
 
             async function turnEnd() {
                 setTimeout(() => {
+                    // BUG: Sometime turn will end in a random moment
+                    // This bug might because the update rate of the draw and thie promise are different 
                     return new Promise((resolve) => {
                         var firstHit;
-                        // console.log("Turn start");
+                        console.log("Turn start");
                         const step = () => {
-                            if (firstHit === undefined) firstHit = Ball.cueBallCollisionCheck();
+                            if (firstHit === undefined) {
+                                firstHit = Ball.cueBallCollisionCheck();
+                                if (firstHit) console.log(firstHit);
+                            }
                             Ball.ballCollisionWithWallCheck();
                             if (!Rule.isAnyBallMoving()) {
                                 Ball.checkList = [];
                                 Rule.turnEndCheck(firstHit);
-                                // console.log("Turn end");
+                                console.log("Turn end");
                                 resolve();
                                 return;
                             }
@@ -227,7 +232,7 @@ class Cue {
 
                         step();
                     });
-                }, 100);
+                }, 10);
             }
 
             if (pushing && positionLock) {
