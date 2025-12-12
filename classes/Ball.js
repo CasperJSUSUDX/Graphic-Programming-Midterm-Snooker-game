@@ -51,11 +51,7 @@ class Ball {
         if (this.balls[0].body.speed > 0.01) {
             for (let i = 1; i < this.balls.length; i++) {
                 var collided = Collision.collides(this.balls[0].body, this.balls[i].body);
-                if (collided) {
-                    // Rule.firstCollisionColor(this.balls[i]);
-                    // console.log(`${this.balls[0].id} collided with cue ball\n${collided}`);
-                    return this.balls[i];
-                }
+                if (collided) return this.balls[i];
             }
         }
     }

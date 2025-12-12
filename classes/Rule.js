@@ -117,14 +117,6 @@ class Rule {
         // collided with wall check
     }
 
-    // Foul checks
-    static firstCollisionColor(ball){
-        if (this.selectedColor == null) this.selectedColor = "#ff0000";
-        // hit correct color
-        if (ball && this.selectedColor == ball.id) return;
-        this.hitOrPottedWrongBall(ball);
-    }
-
     // Foul response
     static failToHitCueBall(score = 0) {
         UI.addAndUpdateScore(-max(4, score));
