@@ -78,7 +78,7 @@ class Rule {
 
         switch (this.stage) {
             case 0:
-                if (foul || !Ball.checkListWasDecreaseAndClear()) {
+                if (foul || (!Ball.checkListWasDecreaseAndClear() && !scene.sinkedMap.get("#ff0000"))) {
                     UI.scoreReset();
                     UI.updateProgressSpan("Restart")
                     this.selectedCueBallInitPos = false;
@@ -89,6 +89,14 @@ class Rule {
                     break;
                 }
 
+                scene.sinkedMap.forEach((value, key) => {
+                    const index = Ball.balls.indexOf(value);
+                    this.previousPotColor = key;
+                    if (key === "#ff0000") this.redWasPotted = true;
+                    UI.addAndUpdateScore(value.score);
+                    World.remove(world, value.body);
+                    Ball.balls.splice(index, 1); 
+                });
                 this.stage++;
                 UI.changeStageSpan(this.stage);
                 break;
@@ -105,8 +113,8 @@ class Rule {
                         }
                     } else {
                         const index = Ball.balls.indexOf(value);
-                        this.previousPotColor = value.id
-                        if (value.id === "#ff0000") this.redWasPotted = true;
+                        this.previousPotColor = key;
+                        if (key === "#ff0000") this.redWasPotted = true;
                         else this.redWasPotted = false;
                         UI.addAndUpdateScore(value.score);
                         World.remove(world, value.body);
@@ -119,11 +127,21 @@ class Rule {
                 }
                 break;
             case 2:
-                if (inOff || hitWrongBall || pottedOutOfTarget.size > 0) {
-                    console.log("Reposition");
-                    this.hitOrPottedWrongBall(value.score);
-                    value.reposition();
+                if (Ball.balls.length == 1) {
+                    UI.updateProgressSpan("Game End", 10000);
                 }
+
+                scene.sinkedMap.forEach((value) => {
+                    if (foul) {
+                        value.reposition();
+                    } else {
+                        const index = Ball.balls.indexOf(value);
+                        this.previousPotColor = value.id;
+                        UI.addAndUpdateScore(value.score);
+                        World.remove(world, value.body);
+                        Ball.balls.splice(index, 1);   
+                    }
+                });
                 break;
         }
         
