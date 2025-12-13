@@ -113,14 +113,17 @@ async function mouseReleased() {
 
 function keyPressed() {
     if (keyCode == 32) {
-        if (Rule.stage === 0 && !Rule.selectedCueBallInitPos) {
-            Rule.selectedCueBallInitPos = Ball.selectPosInDZone(Ball.balls[0]);
-        } else {
-            if (Rule.redWasPotted && Rule.selectedColor === null) {
-                UI.updateProgressSpan("Please select target color");
-            } else {
+        switch (Rule.stage) {
+            case 0:
+                if (!Rule.selectedCueBallInitPos) Rule.selectedCueBallInitPos = Ball.selectPosInDZone(Ball.balls[0]);
+                break;
+            case 1:
+                if (Rule.redWasPotted && Rule.selectedColor === null) UI.updateProgressSpan("Please select target color");
+                else cue.switchMode();
+                break;
+            case 2:
                 cue.switchMode();
-            }
+                break;
         }
     }
 }
