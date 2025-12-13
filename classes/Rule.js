@@ -9,7 +9,6 @@ class Rule {
     static selectedColor = "#ff0000";
     
     // TODO: Add an hit order when stage 2;
-    // TODO: Add select color reminder before push
     static selectColorBall() {
         if (!this.selectedColor) {
             var selected = false;

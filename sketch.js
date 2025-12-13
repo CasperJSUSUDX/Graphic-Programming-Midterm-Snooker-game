@@ -116,7 +116,11 @@ function keyPressed() {
         if (Rule.stage === 0 && !Rule.selectedCueBallInitPos) {
             Rule.selectedCueBallInitPos = Ball.selectPosInDZone(Ball.balls[0]);
         } else {
-            cue.switchMode();
+            if (Rule.redWasPotted && Rule.selectedColor === null) {
+                UI.updateProgressSpan("Please select target color");
+            } else {
+                cue.switchMode();
+            }
         }
     }
 }
