@@ -116,6 +116,7 @@ function keyPressed() {
         switch (Rule.stage) {
             case 0:
                 if (!Rule.selectedCueBallInitPos) Rule.selectedCueBallInitPos = Ball.selectPosInDZone(Ball.balls[0]);
+                else cue.switchMode();
                 break;
             case 1:
                 if (Rule.redWasPotted && Rule.selectedColor === null) UI.updateProgressSpan("Please select target color");
