@@ -158,18 +158,54 @@ class Ball {
                 for (let i = 0; i < 5; i++) {
                     var basicPosY = (ballSize / 2) * i;
                     for (let j = 0; j <= i; j++) {
-                        this.balls.push(
-                            new Ball(
-                                { x: tableLength / 4 + ballSize * (i + 1), y: basicPosY - ballSize * j },
-                                "#ff0000"
-                            )
-                        );
+                        this.balls.push(new Ball(
+                            { x: tableLength / 4 + ballSize * (i + 1), y: basicPosY - ballSize * j },
+                            "#ff0000"
+                        ));
                     }
                 }
                 break;
-            case 2:
+            case 2:                
                 break;
             case 3:
+                // cue ball
+                this.balls.push(new Ball({ x: -tableLength * 0.35, y: 0 }, "#ffffff"));
+                // yellow ball
+                this.balls.push(
+                    new Ball({ x: -tableLength * 0.3, y: tableWidth / 6 }, "#ffff00", 2)
+                );
+                // browen ball
+                this.balls.push(new Ball({ x: -tableLength * 0.3, y: 0 }, "#784315", 4));
+                // green ball
+                this.balls.push(
+                    new Ball({ x: -tableLength * 0.3, y: -tableWidth / 6 }, "#00ff00", 3)
+                );
+                // blue ball
+                this.balls.push(new Ball({ x: 0, y: 0 }, "#0000ff", 5));
+                // pink
+                this.balls.push(new Ball({ x: tableLength / 4, y: 0 }, "#EF88BE", 6));
+                // black ball
+                this.balls.push(new Ball({ x: (tableLength * 9) / 22, y: 0 }, "#000000", 7));
+                // red balls
+                const xInterval = (tableLength * 7) / 264;
+                const yInterval = tableWidth / 12;
+                for (let i = 0; i < 5; i++) {
+                    // top
+                    this.balls.push(new Ball(
+                        { x: tableLength / 4, y: -yInterval * (i + 1) },
+                        "#ff0000"
+                    ));
+                    // bottom
+                    this.balls.push(new Ball(
+                        { x: tableLength / 4, y: yInterval * (i + 1) },
+                        "#ff0000"
+                    ));
+                    // right
+                    this.balls.push(new Ball(
+                        { x: tableLength / 4 + xInterval * (i + 1), y: 0 },
+                        "#ff0000"
+                    ));
+                }
                 break;
             case "debug":
                 this.balls.push(new Ball({ x: 0, y: 0 }, "#ffffff"));
