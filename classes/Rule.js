@@ -127,10 +127,6 @@ class Rule {
                 }
                 break;
             case 2:
-                if (Ball.balls.length == 1) {
-                    UI.updateProgressSpan("Game End", 10000);
-                }
-
                 scene.sinkedMap.forEach((value) => {
                     if (foul) {
                         value.reposition();
@@ -142,12 +138,16 @@ class Rule {
                         Ball.balls.splice(index, 1);
                     }
                 });
+
+                if (Ball.balls.length == 1) {
+                    UI.updateProgressSpan("Game End", 10000);
+                }
                 break;
         }
         
         cue.unlock();
         scene.sinkedMap = new Map();
-        this.selectedColor = null;
+        this.selectedColor = null;  
         UI.resetColorMap();
         this.#firstHit = {
             id: "undefined",
