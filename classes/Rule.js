@@ -3,7 +3,7 @@ class Rule {
     static mode = 1;
     // stage 0: break shoot, stage 1: red and color ball in turn, stage 2: color order
     static stage = 0;
-    static selectedCueBallInitPos = false;
+    static needSelectCueBallPos = true;
     static redWasPotted = false;
     static previousPotColor = null;
     static selectedColor = "#ff0000";
@@ -44,11 +44,11 @@ class Rule {
     
     static turnProcessing = false;
     static #firstHit = {
-        id: "undefined",
-        score: -4
+        id: "empty",
+        score: 4
     };
     static turnProcess() {
-        if (this.#firstHit.id === "undefined") this.#firstHit = Ball.cueBallCollisionCheck();
+        if (this.#firstHit.id === "empty") this.#firstHit = Ball.cueBallCollisionCheck();
         Ball.ballCollisionWithWallCheck();
         if (!this.isAnyBallMoving()) this.#turnEnd();
     }
@@ -60,19 +60,28 @@ class Rule {
         var maxSocre = 0;
         cue.switchLayer();
         if (scene.sinkedMap.has("#ffffff")) inOff = true;
-        if (this.#firstHit.id !== (this.selectedColor || "#ff0000")) hitWrongBall = true;
+        console.log(this.#firstHit.id);
+        // if (this.#firstHit.id  === "empty") {
+        //     this.missHit();
+        //     foul = true;
+        // }
+        if (!["empty", this.selectedColor, "#ff0000"].includes(this.#firstHit.id)) hitWrongBall = true;
         scene.sinkedMap.forEach((value, key) => {
-            if (key !== (this.selectedColor || "#ff0000" || "#ffffff")) {
+            if (![this.selectedColor, "#ff0000", "#ffffff"].includes(key)) {
                 pottedOutOfTarget.add(value);
                 maxSocre = max(maxSocre, value.score);
             }
         });
 
+        console.log(hitWrongBall, pottedOutOfTarget.size)
         if (hitWrongBall || pottedOutOfTarget.size > 0) {
             this.hitOrPottedWrongBall(max(this.#firstHit.score, maxSocre));
             foul = true;
         } else if (inOff) {
             this.pottedCueBall()
+            foul = true;
+        } else if (this.#firstHit.id === "empty") {
+            this.missHit();
             foul = true;
         }
 
@@ -81,7 +90,7 @@ class Rule {
                 if (foul || (!Ball.checkListWasDecreaseAndClear() && !scene.sinkedMap.get("#ff0000"))) {
                     UI.resetScore();
                     UI.updateProgressSpan("Restart", "#ff0000")
-                    this.selectedCueBallInitPos = false;
+                    this.needSelectCueBallPos = true;
                     this.redWasPotted = false;
                     this.previousPotColor = null;
                     this.selectedColor = null;
@@ -150,8 +159,8 @@ class Rule {
         this.selectedColor = null;  
         UI.resetColorMap();
         this.#firstHit = {
-            id: "undefined",
-            score: -4
+            id: "empty",
+            score: 4
         };
         this.turnProcessing = false;
     }
@@ -164,11 +173,15 @@ class Rule {
     static pottedCueBall() {
         UI.updateProgressSpan("Foul: Cue ball in pocket.", "#ff0000");
         UI.addAndUpdateScore(-4);
-        console.log("Please select a place.");
+        this.needSelectCueBallPos = true;
     }
     static hitOrPottedWrongBall(score) {
         UI.updateProgressSpan("Foul: Hitted or Potted wrong color.", "#ff0000");
         UI.addAndUpdateScore(-max(score, 4));
+    }
+    static missHit() {
+        UI.updateProgressSpan("Foul: Cue ball didn't hit any other balls.", "#ff0000");
+        UI.addAndUpdateScore(-4)
     }
     static missTouching() {
         UI.updateProgressSpan("Foul: Touched ball during push.", "#ff0000");

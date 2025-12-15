@@ -56,8 +56,8 @@ class Ball {
         }
 
         return {
-            id: "undefined",
-            score: -4
+            id: "empty",
+            score: 4
         };
     }
     static resetBalls() {

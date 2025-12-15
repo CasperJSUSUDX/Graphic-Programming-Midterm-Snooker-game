@@ -132,18 +132,8 @@ function keyPressed() {
     }
     // space
     if (keyCode === 32) {
-        switch (Rule.stage) {
-            case 0:
-                if (!Rule.selectedCueBallInitPos) Rule.selectedCueBallInitPos = Ball.selectPosInDZone(Ball.balls[0]);
-                else cue.switchMode();
-                break;
-            case 1:
-                if (Rule.redWasPotted && Rule.selectedColor === null) UI.updateProgressSpan("Please select target color", "#ff0000");
-                else cue.switchMode();
-                break;
-            case 2:
-                cue.switchMode();
-                break;
-        }
+        if (Rule.needSelectCueBallPos) Rule.needSelectCueBallPos = !Ball.selectPosInDZone(Ball.balls[0]);
+        else if (Rule.redWasPotted && Rule.selectedColor === null) UI.updateProgressSpan("Please select target color", "#ff0000");
+        else cue.switchMode();
     }
 }
