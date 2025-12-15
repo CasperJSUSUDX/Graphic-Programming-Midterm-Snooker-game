@@ -132,7 +132,7 @@ class Ball {
         Body.setPosition(cueBall.body, vector);
         for (let i = 1; i < this.balls.length; i++) {
             if (Collision.collides(cueBall.body, this.balls[i].body)) {
-                UI.updateProgressSpan("Cannot put cue ball at there.", 2000);
+                UI.updateProgressSpan("Cannot put cue ball at there.", "#ff0000");
                 cueBall.reposition();
                 return false;
             }

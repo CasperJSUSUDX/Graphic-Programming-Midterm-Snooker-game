@@ -138,7 +138,7 @@ function keyPressed() {
                 else cue.switchMode();
                 break;
             case 1:
-                if (Rule.redWasPotted && Rule.selectedColor === null) UI.updateProgressSpan("Please select target color");
+                if (Rule.redWasPotted && Rule.selectedColor === null) UI.updateProgressSpan("Please select target color", "#ff0000");
                 else cue.switchMode();
                 break;
             case 2:

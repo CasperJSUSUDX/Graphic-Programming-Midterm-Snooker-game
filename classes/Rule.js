@@ -80,7 +80,7 @@ class Rule {
             case 0:
                 if (foul || (!Ball.checkListWasDecreaseAndClear() && !scene.sinkedMap.get("#ff0000"))) {
                     UI.resetScore();
-                    UI.updateProgressSpan("Restart")
+                    UI.updateProgressSpan("Restart", "#ff0000")
                     this.selectedCueBallInitPos = false;
                     this.redWasPotted = false;
                     this.previousPotColor = null;
@@ -140,7 +140,7 @@ class Rule {
                 });
 
                 if (Ball.balls.length == 1) {
-                    UI.updateProgressSpan("Game End", 10000);
+                    UI.updateProgressSpan("Game End", "#00ff00", 10000);
                 }
                 break;
         }
@@ -159,19 +159,19 @@ class Rule {
     // Foul response
     static failToHitCueBall(score = 0) {
         UI.addAndUpdateScore(-max(4, score));
-        UI.updateProgressSpan("Foul: Didn't hit cue ball.");
+        UI.updateProgressSpan("Foul: Didn't hit cue ball.", "#ff0000");
     }
     static pottedCueBall() {
-        UI.updateProgressSpan("Foul: Cue ball in pocket.");
+        UI.updateProgressSpan("Foul: Cue ball in pocket.", "#ff0000");
         UI.addAndUpdateScore(-4);
         console.log("Please select a place.");
     }
     static hitOrPottedWrongBall(score) {
-        UI.updateProgressSpan("Foul: Hitted or Potted wrong color.");
+        UI.updateProgressSpan("Foul: Hitted or Potted wrong color.", "#ff0000");
         UI.addAndUpdateScore(-max(score, 4));
     }
     static missTouching() {
-        UI.updateProgressSpan("Foul: Touched ball during push.", 2000);
+        UI.updateProgressSpan("Foul: Touched ball during push.", "#ff0000");
         UI.addAndUpdateScore(-4);
     }
 }
