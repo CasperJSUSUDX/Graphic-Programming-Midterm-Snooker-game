@@ -114,26 +114,26 @@ async function mouseReleased() {
 function keyPressed() {
     // 1
     if (keyCode === 49) {
-        UI.updateProgressSpan("Switch to mode 1");
+        UI.pushProgressSpan("Switch to mode 1");
         mode = 1;
         Ball.resetBalls();
     }
     // 2
     if (keyCode === 50) {
-        UI.updateProgressSpan("Switch to mode 2");
+        UI.pushProgressSpan("Switch to mode 2");
         mode = 2;
         Ball.resetBalls();
     }
     // 3
     if (keyCode === 51) {
-        UI.updateProgressSpan("Switch to mode 3");
+        UI.pushProgressSpan("Switch to mode 3");
         mode = 3;
         Ball.resetBalls();
     }
     // space
     if (keyCode === 32) {
         if (Rule.needSelectCueBallPos) Rule.needSelectCueBallPos = !Ball.selectPosInDZone(Ball.balls[0]);
-        else if (Rule.redWasPotted && Rule.selectedColor === null) UI.updateProgressSpan("Please select target color", "#ff0000");
+        else if (Rule.redWasPotted && Rule.selectedColor === null) UI.pushProgressSpan("Please select target color", "#ff0000");
         else cue.switchMode();
     }
 }

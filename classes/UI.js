@@ -48,7 +48,7 @@ class UI {
     }
 
     static #updateList = [];
-    static createProgressText() {
+    static async createProgressText() {
         const container = createDiv();
         container.style("display", "flex");
         container.style("flex-direction", "column");
@@ -67,6 +67,23 @@ class UI {
         messageSpan.style("font-size", "3vh");
         messageSpan.class("ui-text");
         messageSpan.parent(container);
+
+        // update message span each second
+        const updateInterval = 1000;
+        setInterval(() => {
+            const span = select("#ui-message");
+            if (this.#updateList[0]) {
+                span.style("color", this.#updateList[0].color);
+                span.html(this.#updateList[0].message);
+                this.#updateList[0].time -= updateInterval;
+                if (this.#updateList[0].time <= 0) {
+                    this.#updateList.splice(0, 1);
+                    span.html("");
+                    span.style("color", "#000000");
+                    span.class("ui-text");
+                }
+            }
+        }, updateInterval);
     }
     static changeStageSpan(stage) {
         const span = select("#stage-text");
@@ -85,34 +102,12 @@ class UI {
                 break;
         }
     }
-    static async updateProgressSpan(message, color = "#000000", time = 2000) {
+    static async pushProgressSpan(message, color = "#000000", time = 2000) {
         this.#updateList.push({
             message: message,
+            color: color,
             time: time
         })
-
-        return new Promise((resolve) => {
-            const processNext = () => {
-                const span = select("#ui-message");
-
-                if (this.#updateList.length === 0) {
-                    span.html("");
-                    span.style("color", "#000000");
-                    span.class("ui-text");
-                    resolve();
-                    return;
-                }
-
-                span.style("color", color);
-                span.html(this.#updateList[0].message);
-                var interval = this.#updateList[0].time;
-                this.#updateList.splice(0, 1);
-
-                setTimeout(processNext, interval);
-            }
-            
-            processNext();
-        });
     }
 
     static interval = 60;
