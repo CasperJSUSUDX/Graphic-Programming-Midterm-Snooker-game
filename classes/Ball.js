@@ -165,7 +165,32 @@ class Ball {
                     }
                 }
                 break;
-            case 2:                
+            case 2:
+                // cue ball
+                this.balls.push(new Ball({ x: -tableLength * 0.35, y: 0 }, "#ffffff"));
+                // yellow ball
+                this.balls.push(
+                    new Ball({ x: -tableLength * 0.3, y: tableWidth / 6 }, "#ffff00", 2)
+                );
+                // browen ball
+                this.balls.push(new Ball({ x: -tableLength * 0.3, y: 0 }, "#784315", 4));
+                // green ball
+                this.balls.push(
+                    new Ball({ x: -tableLength * 0.3, y: -tableWidth / 6 }, "#00ff00", 3)
+                );
+                // blue ball
+                this.balls.push(new Ball({ x: 0, y: 0 }, "#0000ff", 5));
+                // pink
+                this.balls.push(new Ball({ x: tableLength / 4, y: 0 }, "#EF88BE", 6));
+                // black ball
+                this.balls.push(new Ball({ x: (tableLength * 9) / 22, y: 0 }, "#000000", 7));
+                // red balls
+                for (let i = 0; i < 15; i++) {
+                    this.balls.push(new Ball(
+                        this.#generatePosition(),
+                        "#ff0000",
+                    ));
+                } 
                 break;
             case 3:
                 // cue ball
@@ -215,5 +240,22 @@ class Ball {
                 break;
         }
 
+    }
+
+    static #generatePosition() {
+        const position = {
+            x: -tableLength / 2 + ballSize + Math.random() * (tableLength - ballSize),
+            y: -tableWidth / 2 + ballSize + Math.random() * (tableWidth - ballSize)
+        };
+
+        for (const ball of this.balls) {
+            const deltaX = ball.initPosition.x - position.x;
+            const deltaY = ball.initPosition.y - position.y;
+            if (Math.sqrt(deltaX ** 2 + deltaY ** 2) <= ballSize / 2) {
+                return this.#generatePosition();
+            }
+        }
+
+        return position;
     }
 }
