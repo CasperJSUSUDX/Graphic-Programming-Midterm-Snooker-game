@@ -69,18 +69,17 @@ class UI {
         messageSpan.parent(container);
 
         // update message span each second
-        const updateInterval = 1000;
+        const updateInterval = 100;
         setInterval(() => {
-            const span = select("#ui-message");
             if (this.#updateList[0]) {
-                span.style("color", this.#updateList[0].color);
-                span.html(this.#updateList[0].message);
+                messageSpan.style("color", this.#updateList[0].color);
+                messageSpan.html(this.#updateList[0].message);
                 this.#updateList[0].time -= updateInterval;
                 if (this.#updateList[0].time <= 0) {
                     this.#updateList.splice(0, 1);
-                    span.html("");
-                    span.style("color", "#000000");
-                    span.class("ui-text");
+                    messageSpan.html("");
+                    messageSpan.style("color", "#000000");
+                    messageSpan.class("ui-text");
                 }
             }
         }, updateInterval);
