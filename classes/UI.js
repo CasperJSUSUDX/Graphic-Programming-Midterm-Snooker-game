@@ -42,7 +42,7 @@ class UI {
         this.#score += num;
         select("#score-text").html(`Score: ${this.#score}`);
     }
-    static scoreReset() {
+    static resetScore() {
         this.#score = 0;
         select("#score-text").html(`Score: ${this.#score}`)
     }

@@ -60,6 +60,15 @@ class Ball {
             score: -4
         };
     }
+    static resetBalls() {
+        World.remove(world, this.balls.map((e) => e.body));
+        Ball.balls = [];
+        this.initBalls(mode);
+        UI.resetScore();
+        for (const ball of this.balls) {
+            Body.translate(ball.body, {x: window.innerWidth / 2, y: window.innerHeight / 2});
+        }
+    }
 
     static #checkList = [];
     static #startLength;

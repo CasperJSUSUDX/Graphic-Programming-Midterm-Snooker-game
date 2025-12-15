@@ -79,7 +79,7 @@ class Rule {
         switch (this.stage) {
             case 0:
                 if (foul || (!Ball.checkListWasDecreaseAndClear() && !scene.sinkedMap.get("#ff0000"))) {
-                    UI.scoreReset();
+                    UI.resetScore();
                     UI.updateProgressSpan("Restart")
                     this.selectedCueBallInitPos = false;
                     this.redWasPotted = false;

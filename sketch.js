@@ -27,7 +27,7 @@ function setup() {
     cuePosition = createVector(0, -tableWidth / 4);
 
     // Ball.initBalls();
-    Ball.initBalls("debug");
+    Ball.initBalls(2);
     
     // bodies initial
     scene = new Scene(
@@ -112,7 +112,26 @@ async function mouseReleased() {
 }
 
 function keyPressed() {
-    if (keyCode == 32) {
+    // 1
+    if (keyCode === 49) {
+        UI.updateProgressSpan("Switch to mode 1");
+        mode = 1;
+        Ball.resetBalls();
+    }
+    // 2
+    if (keyCode === 50) {
+        UI.updateProgressSpan("Switch to mode 2");
+        mode = 2;
+        Ball.resetBalls();
+    }
+    // 3
+    if (keyCode === 51) {
+        UI.updateProgressSpan("Switch to mode 3");
+        mode = 3;
+        Ball.resetBalls();
+    }
+    // space
+    if (keyCode === 32) {
         switch (Rule.stage) {
             case 0:
                 if (!Rule.selectedCueBallInitPos) Rule.selectedCueBallInitPos = Ball.selectPosInDZone(Ball.balls[0]);
