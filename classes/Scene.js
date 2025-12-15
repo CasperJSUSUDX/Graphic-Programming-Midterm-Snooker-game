@@ -1,81 +1,129 @@
 class Scene {
     constructor (length, width, railWidth, pocketSize, color, railColor, restitution = 0.7, friction = 0.1) {
-        const option = {
+        const options = {
             ccd: true,
             restitution: restitution,
             friction: friction,
-            label: "Wall",
+            label: "Rail",
             collisionFilter: {
                 category: SCENE,
                 mask: SCENE,
             },
         };
-
-        this.pocketsPos = [
+        const pocketsPos = [
             {
-                x: window.innerWidth / 2 - length / 2,
-                y: window.innerHeight / 2 - width / 2,
+                x: -length / 2 - railWidth / 2,
+                y: -width / 2 - railWidth / 2,
             },
             {
-                x: window.innerWidth / 2,
-                y: window.innerHeight / 2 - width / 2,
+                x: length / 2 + railWidth / 2,
+                y: -width / 2 - railWidth / 2,
             },
             {
-                x: window.innerWidth / 2 + length / 2,
-                y: window.innerHeight / 2 - width / 2,
+                x: -length / 2 - railWidth / 2,
+                y: width / 2 + railWidth / 2,
             },
             {
-                x: window.innerWidth / 2 - length / 2,
-                y: window.innerHeight / 2 + width / 2,
+                x: length / 2 + railWidth / 2,
+                y: width / 2 + railWidth / 2,
             },
             {
-                x: window.innerWidth / 2,
-                y: window.innerHeight / 2 + width / 2,
+                x: 0,
+                y: -width / 2 - railWidth,
             },
             {
-                x: window.innerWidth / 2 + length / 2,
-                y: window.innerHeight / 2 + width / 2,
+                x: 0,
+                y: width / 2 + railWidth,
             },
         ];
-
+        const leftDeg = PI / 4;
+        const rightDeg = PI / 4;
+        const verticesForHorizontal = [
+            {
+                x: -length / 4 + pocketSize / 4,
+                y: -railWidth / 2
+            },
+            {
+                x: -length / 4 + pocketSize / 4 + railWidth/tan(leftDeg),
+                y: railWidth / 2
+            },
+            {
+                x: length / 4 - pocketSize / 4 - railWidth/tan(rightDeg),
+                y: railWidth / 2
+            },
+            {
+                x: length / 4 - pocketSize / 4,
+                y: -railWidth / 2
+            }
+        ];
+        const verticesForVertical = [
+            {
+                x: -railWidth / 2,
+                y: -width / 2
+            },
+            {
+                x: railWidth / 2,
+                y: -width / 2 + railWidth / tan(rightDeg)
+            },
+            {
+                x: railWidth / 2,
+                y: width / 2 - railWidth / tan(rightDeg)
+            },
+            {
+                x: -railWidth / 2,
+                y: width
+            }
+        ];
+        const parts = [
+            // top left
+            Bodies.fromVertices(
+                -length / 4 - pocketSize / 4,
+                -width / 2 - railWidth / 2,
+                verticesForHorizontal,
+                options
+            ),
+            // top right
+            Bodies.fromVertices(
+                -length / 4 - pocketSize / 4,
+                width / 2 + railWidth / 2,
+                verticesForHorizontal,
+                options
+            ),
+            // bottom left
+            Bodies.fromVertices(
+                length / 4 + pocketSize / 4,
+                -width / 2 - railWidth / 2,
+                verticesForHorizontal,
+                Object.assign(options, {angle: PI})
+            ),
+            // bottom right
+            Bodies.fromVertices(
+                length / 4 + pocketSize / 4,
+                width / 2 + railWidth / 2,
+                verticesForHorizontal,
+                options
+            ),
+            // left
+            Bodies.fromVertices(
+                -length / 2 - railWidth / 2,
+                0,
+                verticesForVertical,
+                Object.assign(options, {angle: 0})
+            ),
+            // right
+            Bodies.fromVertices(
+                length / 2 + railWidth / 2,
+                0,
+                verticesForVertical,
+                Object.assign(options, {angle: PI})
+            )
+        ]
         this.body = Body.create({
-            parts: [
-                // top
-                Bodies.rectangle(
-                    0,
-                    -width / 2 - railWidth / 2,
-                    length,
-                    railWidth,
-                    option
-                ),
-                // left
-                Bodies.rectangle(
-                    -length / 2 - railWidth / 2,
-                    0,
-                    railWidth,
-                    width,
-                    option
-                ),
-                // bottom
-                Bodies.rectangle(
-                    0,
-                    width / 2 + railWidth / 2,
-                    length,
-                    railWidth,
-                    option
-                ),
-                // right
-                Bodies.rectangle(
-                    length / 2 + railWidth / 2,
-                    0,
-                    railWidth,
-                    width,
-                    option
-                ),
-            ],
+            parts: parts,
             isStatic: true,
-            label: "TableCompound",
-        });
+            label: "RailCompound"
+        }); 
+        
         World.add(world, this.body);
 
         this.draw = function() {
@@ -140,21 +188,18 @@ class Scene {
             // pockets
             noStroke();
             fill(0);
-            ellipse(-length / 2 - railWidth / 2, -width / 2 - railWidth / 2, pocketSize);
-            ellipse(length / 2 + railWidth / 2, -width / 2 - railWidth / 2, pocketSize);
-            ellipse(-length / 2 - railWidth / 2, width / 2 + railWidth / 2, pocketSize);
-            ellipse(length / 2 + railWidth / 2, width / 2 + railWidth / 2, pocketSize);
-            ellipse(0, -width / 2 - railWidth, pocketSize);
-            ellipse(0, width / 2 + railWidth, pocketSize);
+            for (const position of pocketsPos) {
+                ellipse(position.x, position.y, pocketSize);
+            }
 
             for (let i = 0; i < 4; i++) {
                 if (i % 2 === 0) {
                     // left
                     drawTrapezoid(
-                        length / 2 - (railWidth * 3) / 4,
+                        length / 2 - pocketSize / 2,
                         railWidth,
-                        PI / 12,
-                        PI / 12,
+                        leftDeg,
+                        rightDeg,
                         "#06402B",
                         {
                             x: -length / 4 - railWidth / 4,
@@ -164,10 +209,10 @@ class Scene {
                     );
                     // right
                     drawTrapezoid(
-                        length / 2 - (railWidth * 3) / 4,
+                        length / 2 - pocketSize / 2,
                         railWidth,
-                        PI / 12,
-                        PI / 12,
+                        leftDeg,
+                        rightDeg,
                         "#06402B",
                         {
                             x: length / 4 + railWidth / 4,
@@ -179,8 +224,8 @@ class Scene {
                     drawTrapezoid(
                         width,
                         railWidth,
-                        PI / 12,
-                        PI / 12,
+                        leftDeg,
+                        rightDeg,
                         "#06402B",
                         {
                             x: (tableLength / 2 + railWidth / 2) * (2 - i),
@@ -196,13 +241,15 @@ class Scene {
         this.sinkedMap = new Map();
         this.sinkCheck = function() {
             for (const ball of Ball.balls) {
-                for (let j = 0; j < this.pocketsPos.length; j++) {
+                for (let j = 0; j < pocketsPos.length; j++) {
+                    const translateX = window.innerWidth / 2 + pocketsPos[j].x;
+                    const translateY = window.innerHeight / 2 + pocketsPos[j].y;
                     if (
                         dist(
                             ball.body.position.x,
                             ball.body.position.y,
-                            this.pocketsPos[j].x,
-                            this.pocketsPos[j].y
+                            translateX,
+                            translateY
                         ) < pocketSize
                     ) {
                         ball.visiable = false;
@@ -223,8 +270,8 @@ class Scene {
             beginShape();
             vertex(-length / 2, -width / 2);
             vertex(length / 2, -width / 2);
-            vertex(length / 2 - width/cos(rightDeg), width / 2);
-            vertex(-length / 2 + width/cos(leftDeg), width / 2);
+            vertex(length / 2 - width/tan(rightDeg), width / 2);
+            vertex(-length / 2 + width/tan(leftDeg), width / 2);
             vertex(-length / 2, -width / 2);
             endShape();
             pop();
