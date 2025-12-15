@@ -85,7 +85,7 @@ class UI {
                 break;
         }
     }
-    static async updateProgressSpan(message, time = 2000) {
+    static async updateProgressSpan(message, color = "#000000", time = 2000) {
         this.#updateList.push({
             message: message,
             time: time
@@ -97,12 +97,13 @@ class UI {
 
                 if (this.#updateList.length === 0) {
                     span.html("");
+                    span.style("color", "#000000");
                     span.class("ui-text");
                     resolve();
                     return;
                 }
 
-                span.class("ui-text warn");
+                span.style("color", color);
                 span.html(this.#updateList[0].message);
                 var interval = this.#updateList[0].time;
                 this.#updateList.splice(0, 1);
