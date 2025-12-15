@@ -52,7 +52,7 @@ class Cue {
         var collisionSensor;
         var hitSensor;
 
-        this.draw = function () {
+        this.draw = function() {
             push();
             translate(window.innerWidth / 2, window.innerHeight / 2);
             translate(position);
@@ -63,7 +63,7 @@ class Cue {
             pop();
         }
 
-        this.move = function () {
+        this.move = function() {
             if (keyIsPressed && !positionLock) {
                 var velocity = createVector(0, 0);
 
@@ -85,7 +85,7 @@ class Cue {
             }
         }
 
-        this.rotate = function () {
+        this.rotate = function() {
             if (!rotationLock) {
                 const translateMouseX = mouseX - window.innerWidth / 2;
                 const translateMouseY = mouseY - window.innerHeight / 2;
@@ -99,7 +99,7 @@ class Cue {
             Body.setAngle(body, deg);
         }
 
-        this.switchMode = function () {
+        this.switchMode = function() {
             if (!pushing && !Rule.isAnyBallMoving()) {
                 if (positionLock) {
                     body.collisionFilter.category = PLAYER;
@@ -125,11 +125,11 @@ class Cue {
             } 
         }
 
-        this.adjustSpeed = function (num) {
+        this.adjustSpeed = function(num) {
             speed = num;
         }
 
-        this.pushStart = function () {
+        this.pushStart = function() {
             if (!pushing && positionLock) {
                 pushing = true;
                 rotationLock = true;
@@ -156,7 +156,7 @@ class Cue {
             }
         }
 
-        this.pushProcess = function () {
+        this.pushProcess = function() {
             if (pushing && positionLock && !hitWhenPushing) {
                 // reset cue position
                 position = originalBodyPos.copy();
@@ -198,7 +198,7 @@ class Cue {
             }
         }
 
-        this.pushEnd = async function () {
+        this.pushEnd = async function() {
             async function cueReposition(direction) {
                 return new Promise((resolve) => {
                     const step = () => {
@@ -256,7 +256,7 @@ class Cue {
         }
 
         // debug use
-        this.drawHitArea = function () {
+        this.drawHitArea = function() {
             push();
             translate(
                 body.position.x + (cos(deg) * (length / 2 + hitSupportRange / 2)),

@@ -13,7 +13,7 @@ class Rule {
         if (!this.selectedColor) {
             var selected = false;
             var index = 1;
-            for (const [key, value] of UI.colorMap.entries()) {
+            for (const [key, _] of UI.colorMap.entries()) {
                 const x = window.innerWidth - (UI.colorMap.size + 1 - index) * UI.interval;
                 const y = UI.interval;
                 if (dist(mouseX, mouseY, x, y) <= UI.circleSize / 2) {
@@ -25,7 +25,7 @@ class Rule {
             }
 
             if (selected) {
-                UI.colorMap.forEach((value, key) => {
+                UI.colorMap.forEach((_, key) => {
                     if (key === this.selectedColor) UI.colorMap.set(key, true);
                     else UI.colorMap.set(key, false);
                 })
@@ -139,7 +139,7 @@ class Rule {
                         this.previousPotColor = value.id;
                         UI.addAndUpdateScore(value.score);
                         World.remove(world, value.body);
-                        Ball.balls.splice(index, 1);   
+                        Ball.balls.splice(index, 1);
                     }
                 });
                 break;
@@ -147,8 +147,8 @@ class Rule {
         
         cue.unlock();
         scene.sinkedMap = new Map();
-        UI.resetColorMap();
         this.selectedColor = null;
+        UI.resetColorMap();
         this.#firstHit = {
             id: "undefined",
             score: -4

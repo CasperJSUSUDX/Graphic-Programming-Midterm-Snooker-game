@@ -147,28 +147,26 @@ class UI {
     static resetColorMap() {
         switch (Rule.stage) {
             case 2:
-                this.colorMap.forEach((value, key) => {
-                    if (key === "#ff0000") {
-                        this.colorMap.set(key, false);
-                    } else {
-                        this.colorMap.set(key, true);
-                    }
-                });
+                if (Ball.balls.length >= 2) {
+                    this.colorMap.forEach((_, key) => {
+                        if (key !== Ball.balls[1].id) {
+                            this.colorMap.set(key, false);
+                        } else {
+                            this.colorMap.set(key, true);
+                            Rule.selectedColor = Ball.balls[1].id;
+                        }
+                    });
+                }
+                    
                 break;
             default:
-                this.colorMap.forEach((value, key) => {
+                this.colorMap.forEach((_, key) => {
                     if (!Rule.redWasPotted) {
-                        if (key === "#ff0000") {
-                            this.colorMap.set(key, true);
-                        } else {
-                            this.colorMap.set(key, false);
-                        }
+                        if (key === "#ff0000") this.colorMap.set(key, true);
+                        else this.colorMap.set(key, false);
                     } else {
-                        if (key === "#ff0000") {
-                            this.colorMap.set(key, false);
-                        } else {
-                            this.colorMap.set(key, true);
-                        }
+                        if (key === "#ff0000") this.colorMap.set(key, false);
+                        else this.colorMap.set(key, true);
                     }
                 });
                 break;
