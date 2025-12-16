@@ -8,7 +8,6 @@ class Rule {
     static previousPotColor = null;
     static selectedColor = "#ff0000";
     
-    // TODO: Add an hit order when stage 2;
     static selectColorBall() {
         if (!this.selectedColor) {
             var selected = false;
@@ -152,6 +151,7 @@ class Rule {
         scene.sinkedMap = new Map();
         this.selectedColor = null;  
         UI.resetColorMap();
+        UI.resetChargeBar();
         this.#firstHit = {
             id: "empty",
             score: 4

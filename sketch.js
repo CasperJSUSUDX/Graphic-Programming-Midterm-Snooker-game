@@ -82,6 +82,7 @@ function draw() {
     scene.sinkCheck();
 
     UI.drawSelectBallArea(Rule.redWasPotted);
+    UI.drawChargeBar();
 
     if (Rule.turnProcessing) Rule.turnProcess();
 

@@ -138,7 +138,6 @@ class UI {
         });
         pop();
     }
-
     static resetColorMap() {
         switch (Rule.stage) {
             case 2:
@@ -166,5 +165,51 @@ class UI {
                 });
                 break;
         }
+    }
+
+    static #maxWidth = window.innerWidth / 75;
+    static #minWidth = window.innerWidth / 125;
+    static #height = window.innerHeight / 3;
+    static #interval = 9;
+    static #barHeight = this.#height / 2;
+    static drawChargeBar() {        
+        push();
+        translate((this.#maxWidth + this.#minWidth), window.innerHeight / 2);
+        // edges
+        stroke(0);
+        fill(100);
+        beginShape();
+        vertex(-this.#maxWidth / 2, -this.#height / 2);
+        vertex(this.#maxWidth / 2, -this.#height / 2);
+        vertex(this.#minWidth / 2, this.#height / 2);
+        vertex(-this.#minWidth / 2, this.#height / 2);
+        endShape();
+        // bar
+        const l = map(this.#barHeight, -this.#height / 2, this.#height / 2, this.#maxWidth / 2, this.#minWidth / 2);
+        const colorR = map(this.#barHeight, this.#height / 2, -this.#height / 2, 0, 255);
+        const colorG = map(this.#barHeight, this.#height / 2, -this.#height / 2, 255, 0);
+        noStroke();
+        fill(colorR, colorG, 0);
+        beginShape();
+        vertex(-l, this.#barHeight);
+        vertex(l, this.#barHeight);
+        vertex(this.#minWidth / 2, this.#height / 2);
+        vertex(-this.#minWidth / 2, this.#height / 2);
+        endShape();
+        // lines
+        stroke(0);
+        fill(0);
+        for (let i = 0; i < this.#interval; i++) {
+            const h = -this.#height / 2 + i * this.#height / this.#interval;
+            const l = map(h, -this.#height / 2, this.#height / 2, this.#maxWidth / 2, this.#minWidth / 2);
+            line(-l, h, l, h);
+        }
+        pop();
+    }
+    static convertForceToChargeBarHeight(currentForce, minForce, maxForce) {
+        this.#barHeight = map(currentForce, minForce, maxForce, this.#height / 2, -this.#height / 2);
+    }
+    static resetChargeBar() {
+        this.#barHeight = this.#height / 2;
     }
 }

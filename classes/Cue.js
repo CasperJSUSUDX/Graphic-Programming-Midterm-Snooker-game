@@ -173,6 +173,7 @@ class Cue {
                     cos(deg),
                     sin(deg)
                 ).mult(moveLength);
+                UI.convertForceToChargeBarHeight(moveLength, 0, 300);
 
                 position.sub(moveDirection);
                 Body.translate(collisionSensor, {
