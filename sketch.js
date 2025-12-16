@@ -136,5 +136,6 @@ function keyPressed() {
         if (Rule.needSelectCueBallPos) Rule.needSelectCueBallPos = !Ball.selectPosInDZone(Ball.balls[0]);
         else if (Rule.redWasPotted && Rule.selectedColor === null) UI.pushProgressSpan("Please select target color", "#ff0000");
         else cue.switchMode();
+        cue.interruptPush();
     }
 }

@@ -256,6 +256,20 @@ class Cue {
             rotationLock = false;
         }
 
+        this.interruptPush  = function() {
+            if (pushing) {
+                pushing = false;
+                cue.unlock();
+                UI.resetChargeBar();
+                position = originalBodyPos.copy();
+                Body.setPosition(collisionSensor, {
+                    x: window.innerWidth / 2 + position.x,
+                    y: window.innerHeight / 2 + position.y
+                });
+                this.switchLayer();
+            }
+        }
+
         // debug use
         this.drawHitArea = function() {
             push();
