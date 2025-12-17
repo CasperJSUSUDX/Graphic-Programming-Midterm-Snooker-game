@@ -1,5 +1,5 @@
 class Ball {
-    constructor(defaultPosition, color, score = 1, size = ballSize) {
+    constructor(defaultPosition, color, _score = 1, _size = ballSize) {
         const ballOptions = {
             ccd: true,
             density: 0.04,
@@ -14,13 +14,14 @@ class Ball {
         };
         this.visiable = true;
         this.id = color;
-        this.score = score;
+        this.score = _score;
         this.body = Bodies.circle(
             defaultPosition.x,
             defaultPosition.y,
-            size / 2,
+            _size / 2,
             ballOptions
         );
+        this.size = _size;
         this.initPosition = {...defaultPosition};
         World.add(world, this.body);
 
@@ -32,7 +33,7 @@ class Ball {
                 stroke(0);
                 strokeWeight(0.5);
                 fill(color);
-                ellipse(0, 0, size);
+                ellipse(0, 0, this.size);
                 pop();
             }
             

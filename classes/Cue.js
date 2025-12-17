@@ -228,10 +228,10 @@ class Cue {
                     originalBodyPos.y - position.y
                 ).div(5);
                 await cueReposition(speed);
-                for (let i = 0; i < Ball.balls.length; i++) {
-                    if (Collision.collides(Ball.balls[i].body, hitSensor)) {
-                        hitBall = Ball.balls[i];
-                        Body.applyForce(Ball.balls[i].body, Ball.balls[i].body.position, {
+                for (const ball of Ball.balls) {
+                    if (Collision.collides(ball.body, hitSensor)) {
+                        hitBall = ball;
+                        Body.applyForce(ball.body, ball.body.position, {
                                 x: cos(deg) * pushForce * 0.02,
                                 y: sin(deg) * pushForce * 0.02,
                             });
@@ -245,6 +245,8 @@ class Cue {
                     Rule.failToHitCueBall();
                 }
                 World.remove(world, collisionSensor);
+                Sparkle.callEffect("spark", [Ball.balls[0]]);
+                Sparkle.callEffect("comet", [Ball.balls[0]]);
                 Rule.turnProcessing = true;
             }
         }

@@ -71,8 +71,10 @@ function draw() {
 
     scene.draw();
 
-    for (let i = 0; i < Ball.balls.length; i++) {
-        Ball.balls[i].draw();
+    Sparkle.drawEffects();
+
+    for (const ball of Ball.balls) {
+        ball.draw();
     }
 
     cue.draw();
