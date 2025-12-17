@@ -71,7 +71,7 @@ function draw() {
 
     scene.draw();
 
-    Sparkle.drawEffects();
+    Particle.drawEffects();
 
     for (const ball of Ball.balls) {
         ball.draw();

@@ -245,8 +245,8 @@ class Cue {
                     Rule.failToHitCueBall();
                 }
                 World.remove(world, collisionSensor);
-                Sparkle.callEffect("spark", [Ball.balls[0]]);
-                Sparkle.callEffect("comet", [Ball.balls[0]]);
+                Particle.callEffect("spark", [Ball.balls[0]]);
+                Particle.callEffect("comet", [Ball.balls[0]]);
                 Rule.turnProcessing = true;
             }
         }

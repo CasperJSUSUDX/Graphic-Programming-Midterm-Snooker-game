@@ -1,4 +1,4 @@
-class Sparkle {
+class Particle {
     constructor(_position, _size, _color, _existTime) {
         var position = {..._position};
         var size = _size;
@@ -15,8 +15,8 @@ class Sparkle {
 
         // auto discard;
         setTimeout(() => {
-            const index = Sparkle.#sparkles.indexOf(this);
-            Sparkle.#sparkles.splice(index, 1);
+            const index = Particle.#sparkles.indexOf(this);
+            Particle.#sparkles.splice(index, 1);
         }, existTime);
     }
 
@@ -64,9 +64,9 @@ class Sparkle {
         const direction = Vector.normalise(target.body.velocity);
         const left = Vector.mult(Vector.rotate(direction, PI / 2), size / 2);
         const right = Vector.neg(left);
-        this.#sparkles.push(new Sparkle(Vector.add(target.body.position, left), size, "#89CFF088", 500));
-        this.#sparkles.push(new Sparkle(target.body.position, size, "#89CFF0cc", 1000));
-        this.#sparkles.push(new Sparkle(Vector.add(target.body.position, right), size, "#89CFF088", 500));
+        this.#sparkles.push(new Particle(Vector.add(target.body.position, left), size, "#89CFF088", 500));
+        this.#sparkles.push(new Particle(target.body.position, size, "#89CFF0cc", 1000));
+        this.#sparkles.push(new Particle(Vector.add(target.body.position, right), size, "#89CFF088", 500));
     }
 
     static #unknowTrail(target, index) {
@@ -79,7 +79,7 @@ class Sparkle {
             x: target.body.position.x + random(-target.size / 2, target.size / 2),
             y: target.body.position.y + random(-target.size / 2, target.size / 2)
         };
-        this.#sparkles.push(new Sparkle(position, 10, "#ffffff88", 500));
+        this.#sparkles.push(new Particle(position, 10, "#ffffff88", 500));
     }
 
     static #sparkWhenHit(target, index) {
@@ -103,7 +103,7 @@ class Sparkle {
 
                 for (let j = 0; j < 20; j++) {
                     const p = Vector.add({...position}, Vector.mult(horizonDirection, random(-size / 2, size / 2)));
-                    this.#sparkles.push(new Sparkle(p, size, "#ff000088", 50000));
+                    this.#sparkles.push(new Particle(p, size, "#ff000088", 50000));
                     position = Vector.add(position, intervalOfParticles);
                 }
 
