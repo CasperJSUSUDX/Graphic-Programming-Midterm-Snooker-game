@@ -131,7 +131,7 @@ class Particle {
 
     static #sparkWhenHit(target, index) {
         const size = 5;
-        const interval = 2;
+        const interval = 3;
         const reverseDirection = Vector.normalise(Vector.neg(target.body.velocity));
         const horizonDirection = Vector.rotate(reverseDirection, PI / 2);
         const sizeVectorOfTarget = Vector.mult(reverseDirection, target.size / 2);
