@@ -1,12 +1,18 @@
 class Particle {
-    constructor(_position, _size, _color, _existTime, isFade = false) {
+    constructor(_position, _size, _color, _existTime, options = {}) {
         var position = {..._position};
         var size = _size;
         var color = _color;
         var existTime = _existTime;
+        const positionCallback = Object.hasOwn(options, "positionCallback") ? options.positionCallback : null; 
+        const isFade = Object.hasOwn(options, "isFade") ? options.isFade : false;
         const self = this;
         
         this.draw = function() {
+            if (positionCallback) {
+                position = positionCallback(position);
+            }
+
             push();
             noStroke();
             fill(color);
@@ -82,9 +88,31 @@ class Particle {
         const direction = Vector.normalise(target.body.velocity);
         const left = Vector.mult(Vector.rotate(direction, PI / 2), size / 2);
         const right = Vector.neg(left);
-        this.#particles.push(new Particle(Vector.add(target.body.position, left), size, "#89CFF088", 300, true));
-        this.#particles.push(new Particle(target.body.position, size, "#89CFF0cc", 1000, true));
-        this.#particles.push(new Particle(Vector.add(target.body.position, right), size, "#89CFF088", 300, true));
+        function getCloseToCenter(position) {
+            const direction = Vector.sub(position, target.body.position);
+            return Vector.sub(position, Vector.normalise(direction));
+        }
+        this.#particles.push(new Particle(
+            Vector.add(target.body.position, left),
+            size,
+            "#89CFF088",
+            300,
+            {
+                positionCallback: getCloseToCenter,
+                isFade: true
+            }
+        ));
+        this.#particles.push(new Particle(
+            Vector.add(target.body.position, right),
+            size,
+            "#89CFF088",
+            300,
+            {
+                positionCallback: getCloseToCenter,
+                isFade: true
+            }
+        ));
+        this.#particles.push(new Particle(target.body.position, size, "#89CFF0cc", 1000, {isFade: true}));
     }
 
     // TODO: Finish spin fire trail
