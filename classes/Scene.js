@@ -250,12 +250,11 @@ class Scene {
                             ball.body.position.y,
                             translateX,
                             translateY
-                        ) < pocketSize
+                        ) < ball.size / 2
                     ) {
-                        ball.visiable = false;
                         Body.set(ball, "isSensor", true);
                         Body.setVelocity(ball.body, {x: 0, y: 0});
-                        this.sinkedMap.set(ball.id, ball);
+                        this.sinkedMap.set(ball.id, ball.fade(0.9));
                     }
                 }
             }

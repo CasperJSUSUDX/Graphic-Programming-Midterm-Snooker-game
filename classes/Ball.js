@@ -45,6 +45,20 @@ class Ball {
             Body.translate(this.body, {x: window.innerWidth / 2, y: window.innerHeight / 2});
             Body.set(this.body, "isSensor", false);
         }
+
+        this.fade = function(rate) {
+            if (this.size < 1) {
+                // this.size = _size;
+                this.visiable = false;
+                return this;
+            }
+
+            console.log(this.size);
+            this.size = this.size * rate;
+            setTimeout(() => {
+                this.fade(rate);
+            }, 20);
+        }
     }
 
     static balls = [];
@@ -247,6 +261,8 @@ class Ball {
                 this.balls.push(new Ball({ x: 0, y: tableWidth / 2 - 50 }, "#ff0000"));
                 this.balls.push(new Ball({ x: tableLength / 2 - 50, y: -tableWidth / 2 + 50 }, "#0000ff",5));
                 this.balls.push(new Ball({ x: tableLength / 2 - 50, y: tableWidth / 2 - 50 }, "#000000", 7));
+                Rule.needSelectCueBallPos = false;
+                Rule.stage = 1;
                 break;
         }
 
