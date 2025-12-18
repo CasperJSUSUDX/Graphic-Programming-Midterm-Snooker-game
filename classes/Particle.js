@@ -29,7 +29,7 @@ class Particle {
     ]);
     static drawEffects() {
         for (const e of this.#effects) {
-            e.func.apply(this, e.args);
+            e.func.apply(this, [...e.args, e.index]);
         }
         for (const sparkle of this.#sparkles) {
             sparkle.draw();
@@ -84,6 +84,7 @@ class Particle {
 
     static #sparkWhenHit(target, index) {
         const size = 5;
+        const interval = 2;
         const reverseDirection = Vector.normalise(Vector.neg(target.body.velocity));
         const horizonDirection = Vector.rotate(reverseDirection, PI / 2);
         const sizeVectorOfTarget = Vector.mult(reverseDirection, target.size / 2);
@@ -102,8 +103,11 @@ class Particle {
                 var position = Vector.sub(target.body.position, sizeVectorOfTarget);
 
                 for (let j = 0; j < 20; j++) {
-                    const p = Vector.add({...position}, Vector.mult(horizonDirection, random(-size / 2, size / 2)));
-                    this.#sparkles.push(new Particle(p, size, "#ff000088", 50000));
+                    var delay = j * interval;
+                    const p = Vector.add({...position}, Vector.mult(horizonDirection, random(-size, size)));
+                    setTimeout(() => {
+                        this.#sparkles.push(new Particle(p, size, "#ff000088", 100));
+                    }, delay);
                     position = Vector.add(position, intervalOfParticles);
                 }
 
