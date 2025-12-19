@@ -53,7 +53,7 @@ class Particle {
     ]);
     static drawEffects() {
         for (const e of this.#effects) {
-            e.func.apply(this, [...e.args, e.index]);
+            e.func.apply(this, [...e.args, this.#effects.indexOf(e)]);
         }
         for (const particle of this.#particles) {
             particle.draw();
@@ -66,10 +66,8 @@ class Particle {
             const obj = {
                 func: this.#effectMap.get(name),
                 args: args,
-                index: -1
             }
             this.#effects.push(obj);
-            obj.index = this.#effects.indexOf(obj);
         }
     }
 
@@ -97,7 +95,7 @@ class Particle {
             Vector.add(centerPosition, left),
             size,
             "#89CFF088",
-            300,
+            1,
             {
                 positionCallback: getCloseToCenter,
                 isFade: true
@@ -107,13 +105,13 @@ class Particle {
             Vector.add(centerPosition, right),
             size,
             "#89CFF088",
-            300,
+            1,
             {
                 positionCallback: getCloseToCenter,
                 isFade: true
             }
         ));
-        this.#particles.push(new Particle(centerPosition, size, "#89CFF0cc", 1000, {isFade: true}));
+        this.#particles.push(new Particle(centerPosition, size, "#89CFF0cc", 1, {isFade: true}));
     }
 
     // TODO: Finish spin fire trail
