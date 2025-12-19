@@ -26,8 +26,8 @@ function setup() {
     // variables initial
     cuePosition = createVector(0, -tableWidth / 4);
 
-    // Ball.initBalls();
-    Ball.initBalls("debug");
+    Ball.initBalls();
+    // Ball.initBalls("debug");
     
     // bodies initial
     scene = new Scene(

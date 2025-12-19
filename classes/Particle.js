@@ -88,12 +88,13 @@ class Particle {
         const direction = Vector.normalise(target.body.velocity);
         const left = Vector.mult(Vector.rotate(direction, PI / 2), size / 2);
         const right = Vector.neg(left);
+        const centerPosition = {...target.body.position};
         function getCloseToCenter(position) {
-            const direction = Vector.sub(position, target.body.position);
+            const direction = Vector.sub(position, centerPosition);
             return Vector.sub(position, Vector.normalise(direction));
         }
         this.#particles.push(new Particle(
-            Vector.add(target.body.position, left),
+            Vector.add(centerPosition, left),
             size,
             "#89CFF088",
             300,
@@ -103,7 +104,7 @@ class Particle {
             }
         ));
         this.#particles.push(new Particle(
-            Vector.add(target.body.position, right),
+            Vector.add(centerPosition, right),
             size,
             "#89CFF088",
             300,
@@ -112,7 +113,7 @@ class Particle {
                 isFade: true
             }
         ));
-        this.#particles.push(new Particle(target.body.position, size, "#89CFF0cc", 1000, {isFade: true}));
+        this.#particles.push(new Particle(centerPosition, size, "#89CFF0cc", 1000, {isFade: true}));
     }
 
     // TODO: Finish spin fire trail
