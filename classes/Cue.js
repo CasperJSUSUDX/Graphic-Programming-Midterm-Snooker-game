@@ -247,6 +247,7 @@ class Cue {
                 World.remove(world, collisionSensor);
                 Particle.callEffect("spark", [Ball.balls[0]]);
                 Particle.callEffect("comet", [Ball.balls[0]]);
+                this.switchLayer();
                 Rule.turnProcessing = true;
             }
         }
