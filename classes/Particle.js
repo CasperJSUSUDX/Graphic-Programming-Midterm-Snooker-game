@@ -36,7 +36,7 @@ class Particle {
         // auto discard;
         setTimeout(() => {
             if (isFade) {
-                fade(0.99);
+                fade(0.9);
             } else {
                 const index = Particle.#particles.indexOf(this);
                 Particle.#particles.splice(index, 1);
@@ -82,7 +82,8 @@ class Particle {
             this.#effects.splice(index, 1);
         }
 
-        const size = 10;
+        const size = target.size / 4;
+        const existTime = 1000;
         const direction = Vector.normalise(target.body.velocity);
         const left = Vector.mult(Vector.rotate(direction, PI / 2), size / 2);
         const right = Vector.neg(left);
@@ -95,7 +96,7 @@ class Particle {
             Vector.add(centerPosition, left),
             size,
             "#89CFF088",
-            1,
+            existTime / 3,
             {
                 positionCallback: getCloseToCenter,
                 isFade: true
@@ -105,13 +106,13 @@ class Particle {
             Vector.add(centerPosition, right),
             size,
             "#89CFF088",
-            1,
+            existTime / 3,
             {
                 positionCallback: getCloseToCenter,
                 isFade: true
             }
         ));
-        this.#particles.push(new Particle(centerPosition, size, "#89CFF0cc", 1, {isFade: true}));
+        this.#particles.push(new Particle(centerPosition, size * 2, "#89CFF0cc", existTime, {isFade: true}));
     }
 
     // TODO: Finish spin fire trail
