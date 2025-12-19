@@ -158,6 +158,7 @@ class Ball {
     }
 
     static initBalls(mode = 1) {
+        // TODO: Add a user tutorial level
         switch (mode) {
             case 1:
                 // cue ball
