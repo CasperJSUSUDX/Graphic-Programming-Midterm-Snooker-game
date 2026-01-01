@@ -247,9 +247,11 @@ class Scene {
             ) <
             ball.size / 2
           ) {
+            if (ball.visiable) Particle.callEffect("sink", [ball]);
             Body.set(ball, "isSensor", true);
+            ball.visiable = false;
             Body.setVelocity(ball.body, { x: 0, y: 0 });
-            this.sinkedMap.set(ball.id, ball.fade(0.9));
+            this.sinkedMap.set(ball.id, ball);
           }
         }
       }

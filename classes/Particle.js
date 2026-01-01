@@ -170,8 +170,8 @@ class Particle {
     this.#effects.splice(index, 1);
   }
 
-  // TODO: Finish spin fire trail
   static #ballSinkAnimation(target, index) {
+    console.log("SINK");
     const position = {
       x: target.body.position.x,
       y: target.body.position.y,
