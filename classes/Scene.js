@@ -196,7 +196,7 @@ class Scene {
             rightDeg,
             "#06402B",
             {
-              x: -length / 4 - railWidth / 4,
+              x: -length / 4 - pocketSize / 4,
               y: (width / 2 + railWidth / 2) * (i - 1),
             },
             (PI * i) / 2
@@ -209,7 +209,7 @@ class Scene {
             rightDeg,
             "#06402B",
             {
-              x: length / 4 + railWidth / 4,
+              x: length / 4 + pocketSize / 4,
               y: (width / 2 + railWidth / 2) * (i - 1),
             },
             (PI * i) / 2
