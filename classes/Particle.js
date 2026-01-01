@@ -50,7 +50,7 @@ class Particle {
   static #effects = [];
   static #effectMap = new Map([
     ["comet", this.#cometTrail],
-    ["spinfire", this.#spinFireTrail],
+    ["sink", this.#ballSinkAnimation],
     ["spark", this.#sparkWhenHit],
   ]);
   static drawEffects() {
@@ -125,20 +125,6 @@ class Particle {
     );
   }
 
-  // TODO: Finish spin fire trail
-  static #spinFireTrail(target, index) {
-    // discard if target stop
-    if (target.body.speed <= 0.1) {
-      this.#effects.splice(index, 1);
-    }
-
-    const position = {
-      x: target.body.position.x + random(-target.size / 2, target.size / 2),
-      y: target.body.position.y + random(-target.size / 2, target.size / 2),
-    };
-    this.#particles.push(new Particle(position, 10, "#ffffff88", 500));
-  }
-
   static #sparkWhenHit(target, index) {
     const size = 5;
     const interval = 3;
@@ -180,6 +166,24 @@ class Particle {
         );
       }
     }
+
+    this.#effects.splice(index, 1);
+  }
+
+  // TODO: Finish spin fire trail
+  static #ballSinkAnimation(target, index) {
+    const position = {
+      x: target.body.position.x,
+      y: target.body.position.y,
+    };
+    const size = target.size;
+    const color = target.id;
+
+    this.#particles.push(
+      new Particle(position, size, color, 1000, {
+        isFade: true,
+      })
+    );
 
     this.#effects.splice(index, 1);
   }
