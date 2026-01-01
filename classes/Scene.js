@@ -133,6 +133,15 @@ class Scene {
       label: "RailCompound",
     });
 
+    // Extension: Bumper
+    const bumperAmount = 5;
+    const bumperSize = pocketSize * 1.5;
+    const bumperOptions = {
+      isStatic: true,
+      restitution: 1.2,
+      label: "Bumper",
+    };
+
     World.add(world, this.body);
 
     this.draw = function () {
