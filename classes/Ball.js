@@ -47,19 +47,6 @@ class Ball {
       });
       Body.set(this.body, "isSensor", false);
     };
-
-    this.fade = function (rate) {
-      if (this.size < 1) {
-        this.visiable = false;
-        return this;
-      }
-
-      console.log(this.size);
-      this.size = this.size * rate;
-      setTimeout(() => {
-        this.fade(rate);
-      }, 20);
-    };
   }
 
   static balls = [];
@@ -291,7 +278,7 @@ class Ball {
         }
         break;
       case "debug":
-        this.balls.push(new Ball({ x: 0, y: 0 }, "#ffffff"));
+        // this.balls.push(new Ball({ x: 0, y: tableWidth / 2 - 100 }, "#ffffff"));
         this.balls.push(new Ball({ x: 0, y: tableWidth / 2 - 50 }, "#ff0000"));
         this.balls.push(
           new Ball(
