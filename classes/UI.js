@@ -242,14 +242,4 @@ class UI {
   static resetChargeBar() {
     this.#barHeight = this.#height / 2;
   }
-
-  // TODO: Create a GUI
-  static drawHomePage() {
-    push();
-    // Background
-    // Title
-    // Start game
-    // Setting
-    pop();
-  }
 }
