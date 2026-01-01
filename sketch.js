@@ -8,136 +8,134 @@ var cue;
 var debugMode = true;
 
 function setup() {
-    createCanvas(window.innerWidth, window.innerHeight);
-    frameRate(60);
-    background(255);
-    rectMode(CENTER);
+  createCanvas(window.innerWidth, window.innerHeight);
+  frameRate(60);
+  background(255);
+  rectMode(CENTER);
 
-    // physic engine initial
-    engine = Engine.create({
-        enableCCD: true,
-        positionIterations: 20,
-        velocityIterations: 12,
-    });
-    world = engine.world;
-    // disable gravity
-    engine.gravity.y = 0;
+  // physic engine initial
+  engine = Engine.create({
+    enableCCD: true,
+    positionIterations: 20,
+    velocityIterations: 12,
+  });
+  world = engine.world;
+  // disable gravity
+  engine.gravity.y = 0;
 
-    // variables initial
-    cuePosition = createVector(0, -tableWidth / 4);
+  // variables initial
+  cuePosition = createVector(0, -tableWidth / 4);
 
-    Ball.initBalls();
-    // Ball.initBalls("debug");
-    
-    // bodies initial
-    scene = new Scene(
-        tableLength,
-        tableWidth,
-        ballSize,
-        ballSize*1.5,
-        "#2A6137",
-        "#784315"
-    );
-    cue = new Cue(
-            createVector(0, -tableWidth / 4),
-            (tableWidth * 5) / 6,
-            tableWidth * 0.014,
-            "#563112",
-            10,
-            tableLength / 307.65,
-            ballSize / 2
-        );
+  Ball.initBalls();
+  // Ball.initBalls("debug");
 
-    // translate the world to the center of user window
-    Composite.translate(
-        world,
-        {
-            x: window.innerWidth / 2,
-            y: window.innerHeight / 2
-        }
-    );
+  // bodies initial
+  scene = new Scene(
+    tableLength,
+    tableWidth,
+    ballSize,
+    ballSize * 1.5,
+    "#2A6137",
+    "#784315"
+  );
+  cue = new Cue(
+    createVector(0, -tableWidth / 4),
+    (tableWidth * 5) / 6,
+    tableWidth * 0.014,
+    "#563112",
+    10,
+    tableLength / 307.65,
+    ballSize / 2
+  );
 
-    UI.createUIContainer();
-    UI.createMoveSensetiveSlider(cue);
-    UI.createScoreText();
-    UI.createProgressText();
+  // translate the world to the center of user window
+  Composite.translate(world, {
+    x: window.innerWidth / 2,
+    y: window.innerHeight / 2,
+  });
+
+  UI.createUIContainer();
+  UI.createMoveSensetiveSlider(cue);
+  UI.createScoreText();
+  UI.createProgressText();
 }
 
 function draw() {
-    // update physic engine
-    Engine.update(engine, 1000 / 60);
+  // update physic engine
+  Engine.update(engine, 1000 / 60);
 
-    background(255);
+  background(255);
 
-    scene.draw();
+  scene.draw();
 
-    Particle.drawEffects();
+  Particle.drawEffects();
 
-    for (const ball of Ball.balls) {
-        ball.draw();
-    }
+  for (const ball of Ball.balls) {
+    ball.draw();
+  }
 
-    cue.draw();
-    cue.move();
-    cue.rotate();
+  cue.draw();
+  cue.move();
+  cue.rotate();
 
-    scene.sinkCheck();
+  scene.sinkCheck();
 
-    UI.drawSelectBallArea(Rule.redWasPotted);
-    UI.drawChargeBar();
+  UI.drawSelectBallArea(Rule.redWasPotted);
+  UI.drawChargeBar();
 
-    if (Rule.turnProcessing) Rule.turnProcess();
+  if (Rule.turnProcessing) Rule.turnProcess();
 
-    if (debugMode) {
-        drawMousePos();
-        cue.drawHitArea();
-    }
+  if (debugMode) {
+    drawMousePos();
+    cue.drawHitArea();
+  }
 }
 
 function mousePressed() {
-    if (!Rule.turnProcessing) {
-        cue.pushStart();
-        Rule.selectColorBall();
-    }
-        
+  if (!Rule.turnProcessing) {
+    cue.pushStart();
+    Rule.selectColorBall();
+  }
 }
 
 function mouseDragged() {
-    if (!Rule.turnProcessing) {
-        cue.pushProcess();
-    }
+  if (!Rule.turnProcessing) {
+    cue.pushProcess();
+  }
 }
 
 async function mouseReleased() {
-    if (!Rule.turnProcessing) {
-        cue.pushEnd();
-    }
+  if (!Rule.turnProcessing) {
+    cue.pushEnd();
+  }
 }
 
 function keyPressed() {
-    // 1
-    if (keyCode === 49) {
-        UI.pushProgressSpan("Switch to mode 1");
-        mode = 1;
-        Ball.resetBalls();
-    }
-    // 2
-    if (keyCode === 50) {
-        UI.pushProgressSpan("Switch to mode 2");
-        mode = 2;
-        Ball.resetBalls();
-    }
-    // 3
-    if (keyCode === 51) {
-        UI.pushProgressSpan("Switch to mode 3");
-        mode = 3;
-        Ball.resetBalls();
-    }
-    // space
-    if (keyCode === 32) {
-        if (Rule.needSelectCueBallPos) Rule.needSelectCueBallPos = !Ball.selectPosInDZone(Ball.balls[0]);
-        else if (Rule.redWasPotted && Rule.selectedColor === null) UI.pushProgressSpan("Please select target color", "#ff0000");
-        else cue.switchMode();
-        cue.interruptPush();
-    }
+  // 1
+  if (keyCode === 49) {
+    UI.pushProgressSpan("Switch to mode 1");
+    mode = 1;
+    Ball.resetBalls();
+  }
+  // 2
+  if (keyCode === 50) {
+    UI.pushProgressSpan("Switch to mode 2");
+    mode = 2;
+    Ball.resetBalls();
+  }
+  // 3
+  if (keyCode === 51) {
+    UI.pushProgressSpan("Switch to mode 3");
+    mode = 3;
+    Ball.resetBalls();
+  }
+  // space
+  if (keyCode === 32) {
+    if (Rule.needSelectCueBallPos)
+      Rule.needSelectCueBallPos = !Ball.selectPosInDZone(Ball.balls[0]);
+    else if (Rule.redWasPotted && Rule.selectedColor === null)
+      UI.pushProgressSpan("Please select target color", "#ff0000");
+    else cue.switchMode();
+    cue.interruptPush();
+  }
 }
