@@ -32,6 +32,11 @@ class Rule {
       }
     }
   }
+
+  /**
+   * Iterate through all the balls and check the speed
+   * @returns {Boolean} whether there are any ball's speed is larger then 0.01
+   */
   static isAnyBallMoving() {
     for (const ball of Ball.balls) {
       if (ball.body.speed >= 0.01) {
@@ -47,12 +52,19 @@ class Rule {
     id: "empty",
     score: 4,
   };
+  /**
+   * The checking functions when there is a ball hit by the cue
+   */
   static turnProcess() {
     if (this.#firstHit.id === "empty")
       this.#firstHit = Ball.cueBallCollisionCheck();
     Ball.ballCollisionWithWallCheck();
     if (!this.isAnyBallMoving()) this.#turnEnd();
   }
+  /**
+   * A helper function of turnProcess
+   * Handling the check things after all the ball is stop(speed < 0.01)
+   */
   static #turnEnd() {
     var inOff = false;
     var hitWrongBall = false;
@@ -60,6 +72,7 @@ class Rule {
     var foul = false;
     var maxSocre = 0;
     cue.switchLayer();
+    // foul check
     if (scene.sinkedMap.has("#ffffff")) inOff = true;
     if (!["empty", this.selectedColor, "#ff0000"].includes(this.#firstHit.id))
       hitWrongBall = true;
@@ -88,6 +101,7 @@ class Rule {
           (!Ball.checkListWasDecreaseAndClear() &&
             !scene.sinkedMap.get("#ff0000"))
         ) {
+          // reset the entire table
           UI.resetScore();
           UI.pushProgressSpan("Restart", "#ff0000");
           this.needSelectCueBallPos = true;
@@ -157,6 +171,7 @@ class Rule {
         break;
     }
 
+    // Unlock the cue and reset the state
     cue.unlock();
     scene.sinkedMap = new Map();
     this.selectedColor = null;

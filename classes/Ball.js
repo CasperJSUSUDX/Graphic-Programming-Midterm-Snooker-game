@@ -50,7 +50,6 @@ class Ball {
 
     this.fade = function (rate) {
       if (this.size < 1) {
-        // this.size = _size;
         this.visiable = false;
         return this;
       }
@@ -80,6 +79,9 @@ class Ball {
       score: 4,
     };
   }
+  /**
+   * Remove and initialize all the ball
+   */
   static resetBalls() {
     World.remove(
       world,
@@ -158,6 +160,8 @@ class Ball {
       vector.y = mouseY;
     }
 
+    // check whether the ball will collide with other ball or not
+    // if collide then fail to select and return false
     Body.set(cueBall.body, "isSensor", true);
     Body.setPosition(cueBall.body, vector);
     for (let i = 1; i < this.balls.length; i++) {
@@ -309,6 +313,11 @@ class Ball {
     }
   }
 
+  /**
+   * Generate a random position inside the table
+   * If there exist a ball at the position, call itself until success
+   * @returns {2D Vector} a position
+   */
   static #generatePosition() {
     const position = {
       x: -tableLength / 2 + ballSize + Math.random() * (tableLength - ballSize),
