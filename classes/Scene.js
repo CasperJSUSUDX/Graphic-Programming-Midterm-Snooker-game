@@ -133,15 +133,6 @@ class Scene {
       label: "RailCompound",
     });
 
-    // Extension: Bumper
-    const bumperAmount = 5;
-    const bumperSize = pocketSize * 1.5;
-    const bumperOptions = {
-      isStatic: true,
-      restitution: 1.2,
-      label: "Bumper",
-    };
-
     World.add(world, this.body);
 
     this.draw = function () {
@@ -307,5 +298,82 @@ class Scene {
       endShape();
       pop();
     }
+  }
+
+  static #bumpers = [];
+  static #bumperWidth = window.innerWidth * 0.0085;
+  static #bumperOptions = {
+    isStatic: true,
+    ccd: true,
+    restitution: 2,
+    label: "wall",
+  };
+  static #isBumperPositionVaild(position, length) {
+    // overlapping detect
+    for (const _bumper of this.#bumpers) {
+      const _x = _bumper.body.position.x;
+      const _y = _bumper.body.position.y;
+
+      if (
+        dist(position.x, position.y, _x, _y) <
+        length / 2 + _bumper.length / 2
+      )
+        return false;
+    }
+
+    return true;
+  }
+  static createBumper(amount) {
+    for (let i = 0; i < amount; i++) {
+      const position = {
+        x: 0,
+        y: 0,
+      };
+      const bumper = {
+        length: undefined,
+        angle: undefined,
+        body: undefined,
+      };
+      while (true) {
+        bumper.angle = random(-PI, PI);
+        bumper.length = random(50, 300);
+        position.x = random(
+          -tableLength / 2 + bumper.length / 2,
+          tableLength / 2 - bumper.length / 2
+        );
+        position.y = random(
+          -tableWidth / 2 + bumper.length / 2,
+          tableWidth / 2 - bumper.length / 2
+        );
+
+        if (this.#isBumperPositionVaild(position, bumper.length)) break;
+      }
+
+      bumper.body = Bodies.rectangle(
+        position.x,
+        position.y,
+        bumper.length,
+        this.#bumperWidth,
+        this.#bumperOptions
+      );
+      Body.rotate(bumper.body, bumper.angle);
+
+      this.#bumpers.push(bumper);
+      World.add(world, bumper.body);
+    }
+  }
+  static drawBumper() {
+    push();
+    noStroke();
+    fill("#90D5FF");
+    for (const bumper of this.#bumpers) {
+      const position = bumper.body.position;
+      push();
+      translate(position.x, position.y);
+      rotate(bumper.angle);
+      rect(0, 0, bumper.length, this.#bumperWidth);
+      pop();
+    }
+    pop();
   }
 }

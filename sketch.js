@@ -26,8 +26,8 @@ function setup() {
   // variables initial
   cuePosition = createVector(0, -tableWidth / 4);
 
-  //   Ball.initBalls();
-  Ball.initBalls("debug");
+  Ball.initBalls(4);
+  // Ball.initBalls("debug");
 
   // bodies initial
   scene = new Scene(
@@ -67,6 +67,7 @@ function draw() {
   background(255);
 
   scene.draw();
+  Scene.drawBumper();
 
   Particle.drawEffects();
 
