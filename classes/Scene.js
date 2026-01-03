@@ -13,7 +13,7 @@ class Scene {
       ccd: true,
       restitution: restitution,
       friction: friction,
-      label: "Rail",
+      label: "Wall",
       collisionFilter: {
         category: SCENE,
         mask: SCENE,
@@ -306,7 +306,7 @@ class Scene {
     isStatic: true,
     ccd: true,
     restitution: 2,
-    label: "wall",
+    label: "Wall",
   };
   static #isBumperPositionVaild(position, length) {
     // overlapping detect
@@ -376,4 +376,6 @@ class Scene {
     }
     pop();
   }
+
 }
+

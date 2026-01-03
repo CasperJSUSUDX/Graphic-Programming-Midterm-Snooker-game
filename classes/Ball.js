@@ -88,14 +88,19 @@ class Ball {
   static #checkList = [];
   static #startLength;
   static ballCollisionWithWallCheck() {
+    if (this.#checkList.length === 0) return;
+
     for (let i = 0; i < this.#checkList.length; i++) {
-      var collided = null;
-      for (let j = 1; j < scene.body.parts.length; j++) {
-        collided = Collision.collides(
-          this.#checkList[i].body,
-          scene.body.parts[j]
-        );
-        if (collided) break;
+      let collided = false;
+
+      for (const b of world.bodies) {
+        if (b.label === "Wall") {
+          if (Collision.collides(this.#checkList[i].body, b)) {
+            collided = true;
+            console.log(b);
+            break;
+          }
+        }
       }
 
       if (collided) {
