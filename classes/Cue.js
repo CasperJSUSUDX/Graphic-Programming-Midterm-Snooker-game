@@ -43,7 +43,6 @@ class Cue {
     var maxPushForce = _maxPushForce;
     var hitSupportRange = _hitSupportRange;
     var pushing = false;
-    var hitWhenPushing = false;
     var positionLock = false;
     var rotationLock = false;
     var originalBodyPos;
@@ -100,7 +99,6 @@ class Cue {
         deg = atan2(translateMouseY - position.y, translateMouseX - position.x);
       }
 
-      // TODO(Casper): Switch to useing angular speed to spin cue instead of useing "setAngle"
       Body.setAngle(body, deg);
     };
 
@@ -162,7 +160,7 @@ class Cue {
     };
 
     this.pushProcess = function () {
-      if (pushing && positionLock && !hitWhenPushing) {
+      if (pushing && positionLock) {
         // reset cue position
         position = originalBodyPos.copy();
         Body.setPosition(collisionSensor, {
@@ -184,16 +182,10 @@ class Cue {
         });
 
         // hit ball during pushing
-        for (let i = 0; i < Ball.balls.length; i++) {
-          if (Collision.collides(Ball.balls[i].body, collisionSensor)) {
-            Rule.missTouching();
-            hitWhenPushing = true;
-            // case 1: Hit white ball
-            if (i === 0) {
-            }
-            // case 2: Hit color balls
-            else {
-            }
+        for (const ball of Ball.balls) {
+          if (Collision.collides(ball, collisionSensor)) {
+            Rule.missTouching(ball);
+            cue.interruptPush();
           }
         }
       }
@@ -258,7 +250,6 @@ class Cue {
     this.unlock = function () {
       pushing = false;
       positionLock = false;
-      hitWhenPushing = false;
       rotationLock = false;
     };
 
