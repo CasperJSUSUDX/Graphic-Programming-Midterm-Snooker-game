@@ -70,6 +70,10 @@ class Cue {
       pop();
     };
 
+    this.getBody = function () {
+      return body;
+    }
+
     this.move = function () {
       if (keyIsPressed && !positionLock) {
         var velocity = createVector(0, 0);

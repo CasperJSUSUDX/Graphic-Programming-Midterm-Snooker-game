@@ -5,6 +5,7 @@ const tableWidth = tableLength / 2;
 const ballSize = tableWidth / 36;
 var scene;
 var cue;
+var tutorial;
 var debugMode = true;
 
 function setup() {
@@ -22,9 +23,6 @@ function setup() {
   world = engine.world;
   // disable gravity
   engine.gravity.y = 0;
-
-  // variables initial
-  cuePosition = createVector(0, -tableWidth / 4);
 
   Ball.initBalls(4);
   // Ball.initBalls("debug");
@@ -58,6 +56,10 @@ function setup() {
   UI.createMoveSensetiveSlider(cue);
   UI.createScoreText();
   UI.createProgressText();
+
+  // tutorial
+  tutorial = new Tutorial();
+  tutorial.start();
 }
 
 function draw() {
@@ -90,9 +92,16 @@ function draw() {
     drawMousePos();
     cue.drawHitArea();
   }
+
+  // tutorial draw
+  tutorial.draw();
 }
 
 function mousePressed() {
+  if (tutorial.active) {
+    if (tutorial.mousePressed()) return;
+  }
+
   if (!Rule.turnProcessing) {
     cue.pushStart();
     Rule.selectColorBall();
@@ -106,6 +115,7 @@ function mouseDragged() {
 }
 
 async function mouseReleased() {
+  if (tutorial.active) return;
   if (!Rule.turnProcessing) {
     cue.pushEnd();
   }
@@ -138,5 +148,21 @@ function keyPressed() {
       UI.pushProgressSpan("Please select target color", "#ff0000");
     else cue.switchMode();
     cue.interruptPush();
+  }
+
+  // t
+  if (keyCode === 84) {
+    if (tutorial.active) tutorial.end();
+    else tutorial.start();
+  }
+
+  // left arrow
+  if (keyCode === 37) {
+    if (tutorial.active) tutorial.prev();
+  }
+
+  // right arrow
+  if (keyCode === 39) {
+    if (tutorial.active) tutorial.next();
   }
 }
