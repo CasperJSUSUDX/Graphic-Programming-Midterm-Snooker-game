@@ -183,7 +183,7 @@ class Cue {
 
         // hit ball during pushing
         for (const ball of Ball.balls) {
-          if (Collision.collides(ball, collisionSensor)) {
+          if (Collision.collides(ball.body, collisionSensor)) {
             Rule.missTouching(ball);
             cue.interruptPush();
           }
