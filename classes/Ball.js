@@ -93,11 +93,10 @@ class Ball {
     for (let i = 0; i < this.#checkList.length; i++) {
       let collided = false;
 
-      for (const b of world.bodies) {
-        if (b.label === "Wall") {
-          if (Collision.collides(this.#checkList[i].body, b)) {
+      for (const body of world.bodies) {
+        if (body.label === "Wall") {
+          if (Collision.collides(this.#checkList[i].body, body)) {
             collided = true;
-            console.log(b);
             break;
           }
         }
@@ -283,7 +282,6 @@ class Ball {
         }
         break;
       case 4:
-        Scene.createBumper(5);
         // cue ball
         this.balls.push(new Ball({ x: -tableLength * 0.35, y: 0 }, "#ffffff"));
         // yellow ball
@@ -321,6 +319,8 @@ class Ball {
             );
           }
         }
+
+        Scene.createBumper(5);
         break;
       case "debug":
         this.balls.push(new Ball({ x: 0, y: tableWidth / 2 - 100 }, "#ffffff"));
