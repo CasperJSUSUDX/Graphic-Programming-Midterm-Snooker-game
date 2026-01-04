@@ -382,7 +382,7 @@ class Scene {
       push();
       translate(position.x, position.y);
       rotate(bumper.angle);
-      rect(0, 0, bumper.length, bumperWidth, bumperWidth/2);
+      rect(0, 0, bumper.length, this.#bumperWidth, this.#bumperWidth / 2);
       pop();
     }
     pop();
