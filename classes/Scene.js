@@ -366,6 +366,10 @@ class Scene {
       Body.rotate(bumper.body, bumper.angle);
 
       this.#bumpers.push(bumper);
+      Body.translate(bumper.body, {
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2,
+      });
       World.add(world, bumper.body);
     }
   }
@@ -383,6 +387,13 @@ class Scene {
     }
     pop();
   }
+  static removeBumpers() {
+    if (this.#bumpers.length == 0) return;
 
+    World.remove(
+      world,
+      this.#bumpers.map((bumper) => bumper.body)
+    );
+    this.#bumpers = [];
+  }
 }
-

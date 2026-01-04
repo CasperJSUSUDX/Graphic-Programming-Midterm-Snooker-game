@@ -24,7 +24,7 @@ function setup() {
   // disable gravity
   engine.gravity.y = 0;
 
-  Ball.initBalls(4);
+  Ball.initBalls();
   // Ball.initBalls("debug");
 
   // bodies initial
@@ -126,20 +126,31 @@ function keyPressed() {
   if (keyCode === 49) {
     UI.pushProgressSpan("Switch to mode 1");
     mode = 1;
+    Scene.removeBumpers();
     Ball.resetBalls();
   }
   // 2
   if (keyCode === 50) {
     UI.pushProgressSpan("Switch to mode 2");
     mode = 2;
+    Scene.removeBumpers();
     Ball.resetBalls();
   }
   // 3
   if (keyCode === 51) {
     UI.pushProgressSpan("Switch to mode 3");
     mode = 3;
+    Scene.removeBumpers();
     Ball.resetBalls();
   }
+  // 4
+  if (keyCode === 52) {
+    UI.pushProgressSpan("Switch to mode 4");
+    mode = 4;
+    Scene.removeBumpers();
+    Ball.resetBalls();
+  }
+
   // space
   if (keyCode === 32) {
     if (Rule.needSelectCueBallPos)
