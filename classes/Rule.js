@@ -205,8 +205,4 @@ class Rule {
     );
     UI.addAndUpdateScore(-4);
   }
-  static missTouching(ball) {
-    UI.pushProgressSpan("Foul: Touched ball during push.", "#ff0000");
-    UI.addAndUpdateScore(-max(4, ball.score));
-  }
 }
