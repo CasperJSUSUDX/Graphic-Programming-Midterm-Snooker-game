@@ -1,4 +1,18 @@
+/**
+ * Class is releated the snooker table
+ * Manages the physics body, render, and bumper logics
+ */
 class Scene {
+  /**
+   * @param {Number} length - Table length
+   * @param {Number} width - Table width
+   * @param {Number} railWidth - Width of the cushion rails
+   * @param {Number} pocketSize - Diameter of the pockets
+   * @param {String} color - Hex color for the table background
+   * @param {String} railColor - Hex color for the cushion rails
+   * @param {Number} restitution - Bounciness of the cushion rails (default 0.7)
+   * @param {Number} friction - Friction of the cushion rails (default 0.1)
+   */
   constructor(
     length,
     width,
@@ -19,6 +33,7 @@ class Scene {
         mask: SCENE,
       },
     };
+    // pocket positions relative to center of the table
     const pocketsPos = [
       {
         x: -length / 2 - railWidth / 2,
@@ -45,8 +60,11 @@ class Scene {
         y: width / 2 + railWidth,
       },
     ];
+
     const leftDeg = PI / 4;
     const rightDeg = PI / 4;
+
+    // Define trapezoidal shapes for horizontal rails
     const verticesForHorizontal = [
       {
         x: -length / 4 + pocketSize / 4,
@@ -65,6 +83,8 @@ class Scene {
         y: -railWidth / 2,
       },
     ];
+
+    // Define trapezoidal shapes for vertical rails
     const verticesForVertical = [
       {
         x: -railWidth / 2,
@@ -83,6 +103,8 @@ class Scene {
         y: width,
       },
     ];
+
+    // Create the bodies of cushion rails
     const parts = [
       // top left
       Bodies.fromVertices(
@@ -127,6 +149,8 @@ class Scene {
         Object.assign(options, { angle: PI })
       ),
     ];
+
+    // Combine the parts into one static body
     this.body = Body.create({
       parts: parts,
       isStatic: true,
@@ -135,6 +159,9 @@ class Scene {
 
     World.add(world, this.body);
 
+    /**
+     * Render the table and its components
+     */
     this.draw = function () {
       // draw table
       push();
@@ -233,11 +260,18 @@ class Scene {
     };
 
     this.sinkedMap = new Map();
+
+    /**
+     * Check if any ball has entered any pocket
+     * If sinked, convert the ball to invisiable
+     */
     this.sinkCheck = function () {
       for (const ball of Ball.balls) {
         for (let j = 0; j < pocketsPos.length; j++) {
           const translateX = window.innerWidth / 2 + pocketsPos[j].x;
           const translateY = window.innerHeight / 2 + pocketsPos[j].y;
+
+          // check distance between ball and pocket center
           if (
             dist(
               ball.body.position.x,
@@ -247,16 +281,22 @@ class Scene {
             ) <
             ball.size / 2
           ) {
+            // Trigger effect
             if (ball.visiable) Particle.callEffect("sink", [ball]);
+
+            // Disable collision and conver to invisiable
             Body.set(ball, "isSensor", true);
             ball.visiable = false;
             Body.setVelocity(ball.body, { x: 0, y: 0 });
+
+            // set the ball into sinkMap
             this.sinkedMap.set(ball.id, ball);
           }
         }
       }
     };
 
+    // drawing helper function
     function drawTrapezoid(
       length,
       width,
@@ -308,6 +348,13 @@ class Scene {
     restitution: 2,
     label: "Wall",
   };
+  /**
+   * Helper function
+   * Ensures generated bumpers do not overlap with balls or other bumpers.
+   * @param {2D vector} position - the position of the bumper
+   * @param {Number} length - length of the bumper
+   * @returns 
+   */
   static #isBumperPositionVaild(position, length) {
     const offsetPosition = {
       x: position.x + window.innerWidth / 2,
@@ -335,6 +382,11 @@ class Scene {
 
     return true;
   }
+
+  /**
+   * Generate random bumpers
+   * @param {Number} amount - Number of bumpers to create
+   */
   static createBumper(amount) {
     for (let i = 0; i < amount; i++) {
       const position = {
@@ -346,6 +398,8 @@ class Scene {
         angle: undefined,
         body: undefined,
       };
+
+      // Attempt to find a vaild position
       while (true) {
         bumper.angle = random(-PI, PI);
         bumper.length = random(50, 300);
@@ -378,6 +432,10 @@ class Scene {
       World.add(world, bumper.body);
     }
   }
+
+  /**
+   * Render function of the bumpers
+   */
   static drawBumper() {
     push();
     noStroke();
@@ -392,6 +450,10 @@ class Scene {
     }
     pop();
   }
+
+  /**
+   * Remove bumper from world and clear this.#bumpers
+   */
   static removeBumpers() {
     if (this.#bumpers.length == 0) return;
 
