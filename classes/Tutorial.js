@@ -1,3 +1,7 @@
+/**
+ * Class handle the interactive tutorial overlay.
+ * Steps through instructions for movement, aiming, and game rules.
+ */
 class Tutorial {
   constructor() {
     this.active = true;
