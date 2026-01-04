@@ -197,6 +197,30 @@ class UI {
         break;
     }
   }
+  static selectColorBall() {
+    if (!Rule.selectedColor) {
+      var selected = false;
+      var index = 1;
+      for (const [key, _] of UI.colorMap.entries()) {
+        const x =
+          window.innerWidth - (UI.colorMap.size + 1 - index) * UI.interval;
+        const y = UI.interval;
+        if (dist(mouseX, mouseY, x, y) <= UI.circleSize / 2) {
+          Rule.selectedColor = key;
+          selected = true;
+          break;
+        }
+        index++;
+      }
+
+      if (selected) {
+        UI.colorMap.forEach((_, key) => {
+          if (key === Rule.selectedColor) UI.colorMap.set(key, true);
+          else UI.colorMap.set(key, false);
+        });
+      }
+    }
+  }
 
   static #maxWidth = window.innerWidth / 75;
   static #minWidth = window.innerWidth / 125;

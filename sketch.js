@@ -140,7 +140,7 @@ function mousePressed() {
 
   if (!Rule.turnProcessing) {
     cue.pushStart();
-    Rule.selectColorBall();
+    UI.selectColorBall();
   }
 }
 
