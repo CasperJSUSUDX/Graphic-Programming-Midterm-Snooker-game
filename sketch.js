@@ -1,8 +1,21 @@
 const SCENE = 0b0001;
-const PLAYER = 0b0010;
 const tableLength = window.innerWidth * 0.6;
 const tableWidth = tableLength / 2;
 const ballSize = tableWidth / 36;
+const {
+  Engine,
+  Body,
+  Bodies,
+  World,
+  Composite,
+  Runner,
+  Collision,
+  Events,
+  Vector,
+} = Matter;
+
+var engine;
+var world;
 var scene;
 var cue;
 var tutorial;
