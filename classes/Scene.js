@@ -309,6 +309,11 @@ class Scene {
     label: "Wall",
   };
   static #isBumperPositionVaild(position, length) {
+    const offsetPosition = {
+      x: position.x + window.innerWidth / 2,
+      y: position.y + window.innerHeight / 2,
+    };
+
     // overlapping ball detect
     for (const ball of Ball.balls) {
       const _x = ball.body.position.x;
@@ -322,7 +327,7 @@ class Scene {
       const _y = _bumper.body.position.y;
 
       if (
-        dist(position.x, position.y, _x, _y) <
+        dist(offsetPosition.x, offsetPosition.y, _x, _y) <
         length / 2 + _bumper.length / 2
       )
         return false;
