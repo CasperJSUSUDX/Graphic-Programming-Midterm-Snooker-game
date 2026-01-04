@@ -12,7 +12,7 @@ class Tutorial {
         title: "Move the Cue",
         text: "Use WASD to move the cue (when positioned). Try pressing and holding W/A/S/D to move the cue.",
         overlay: () => {
-          const position = cue.getBody().position;
+          const position = cue.position;
           push();
           stroke(255, 255, 0);
           strokeWeight(3);
@@ -30,7 +30,7 @@ class Tutorial {
         text: "Move your mouse to aim. The cue rotates towards the mouse.",
         overlay: () => {
           if (typeof cue !== "undefined") {
-            const position = cue.getBody().position;
+            const position = cue.position;
             push();
             stroke(0, 255, 255);
             strokeWeight(3);

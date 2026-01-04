@@ -71,7 +71,6 @@ class Rule {
     var pottedOutOfTarget = new Set();
     var foul = false;
     var maxSocre = 0;
-    cue.switchLayer();
     // foul check
     if (scene.sinkedMap.has("#ffffff")) inOff = true;
     if (!["empty", this.selectedColor, "#ff0000"].includes(this.#firstHit.id))

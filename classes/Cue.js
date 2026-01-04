@@ -16,17 +16,6 @@ class Cue {
     _maxPushForce,
     _hitSupportRange
   ) {
-    const bodyOptions = {
-      isStatic: true,
-      density: 0.06,
-      friction: 0.8,
-      frictionAir: 0.8,
-      label: "cue",
-      collisionFilter: {
-        category: PLAYER,
-        mask: PLAYER,
-      },
-    };
     const sensorOptions = {
       isSensor: true,
       collisionFilter: {
@@ -34,7 +23,10 @@ class Cue {
         mask: SCENE,
       },
     };
-    var position = _initPos;
+    var position = _initPos.add(
+      createVector(window.innerWidth / 2, window.innerHeight / 2)
+    );
+
     var deg = 0;
     var length = _length;
     var diameter = _diameter;
@@ -47,21 +39,10 @@ class Cue {
     var rotationLock = false;
     var originalBodyPos;
     var pushStartPos;
-
-    var body = Bodies.rectangle(
-      position.x,
-      position.y,
-      length,
-      diameter,
-      bodyOptions
-    );
-    World.add(world, body);
-    var collisionSensor;
     var hitSensor;
 
     this.draw = function () {
       push();
-      translate(window.innerWidth / 2, window.innerHeight / 2);
       translate(position);
       rotate(deg);
       noStroke();
@@ -70,9 +51,9 @@ class Cue {
       pop();
     };
 
-    this.getBody = function () {
-      return body;
-    }
+    this.getP = function () {
+      return position;
+    };
 
     this.move = function () {
       if (keyIsPressed && !positionLock) {
@@ -89,46 +70,18 @@ class Cue {
 
         velocity.normalize().mult(speed);
         position.add(velocity);
-        Body.translate(body, {
-          x: velocity.x,
-          y: velocity.y,
-        });
       }
     };
 
     this.rotate = function () {
       if (!rotationLock) {
-        const translateMouseX = mouseX - window.innerWidth / 2;
-        const translateMouseY = mouseY - window.innerHeight / 2;
-        deg = atan2(translateMouseY - position.y, translateMouseX - position.x);
+        deg = atan2(mouseY - position.y, mouseX - position.x);
       }
-
-      Body.setAngle(body, deg);
     };
 
     this.switchMode = function () {
       if (!pushing && !Rule.isAnyBallMoving()) {
-        if (positionLock) {
-          body.collisionFilter.category = PLAYER;
-          body.collisionFilter.mask = PLAYER;
-          // rotationLock = false;
-        } else {
-          body.collisionFilter.category = SCENE;
-          body.collisionFilter.mask = SCENE;
-          // rotationLock = true;
-        }
-
         positionLock = !positionLock;
-      }
-    };
-
-    this.switchLayer = function () {
-      if ((body.collisionFilter.category = SCENE)) {
-        body.collisionFilter.category = PLAYER;
-        body.collisionFilter.mask = PLAYER;
-      } else {
-        body.collisionFilter.category = SCENE;
-        body.collisionFilter.mask = SCENE;
       }
     };
 
@@ -142,24 +95,15 @@ class Cue {
         rotationLock = true;
         pushStartPos = createVector(mouseX, mouseY);
         originalBodyPos = position.copy();
-
-        collisionSensor = Bodies.rectangle(
-          body.position.x,
-          body.position.y,
-          length,
-          diameter,
-          sensorOptions
-        );
         hitSensor = Bodies.rectangle(
-          body.position.x + cos(deg) * (length / 2 + hitSupportRange / 2),
-          body.position.y + sin(deg) * (length / 2 + hitSupportRange / 2),
+          position.x + cos(deg) * (length / 2 + hitSupportRange / 2),
+          position.y + sin(deg) * (length / 2 + hitSupportRange / 2),
           hitSupportRange,
           hitSupportRange,
           sensorOptions
         );
-        Body.setAngle(collisionSensor, deg);
         Body.setAngle(hitSensor, deg);
-        World.add(world, [collisionSensor, hitSensor]);
+        World.add(world, hitSensor);
       }
     };
 
@@ -167,10 +111,6 @@ class Cue {
       if (pushing && positionLock) {
         // reset cue position
         position = originalBodyPos.copy();
-        Body.setPosition(collisionSensor, {
-          x: window.innerWidth / 2 + position.x,
-          y: window.innerHeight / 2 + position.y,
-        });
 
         // calulate cue's moving and store cue position
         originalBodyPos = position.copy();
@@ -178,12 +118,7 @@ class Cue {
         const moveLength = min(300, pushEndPos.sub(pushStartPos).mag());
         const moveDirection = createVector(cos(deg), sin(deg)).mult(moveLength);
         UI.convertForceToChargeBarHeight(moveLength, 0, 300);
-
         position.sub(moveDirection);
-        Body.translate(collisionSensor, {
-          x: -moveDirection.x,
-          y: -moveDirection.y,
-        });
       }
     };
 
@@ -235,10 +170,9 @@ class Cue {
         } else {
           Rule.failToHitCueBall();
         }
-        World.remove(world, collisionSensor);
+        World.remove(world, hitSensor);
         Particle.callEffect("spark", [Ball.balls[0]]);
         Particle.callEffect("comet", [Ball.balls[0]]);
-        this.switchLayer();
         Rule.turnProcessing = true;
       }
     };
@@ -259,7 +193,6 @@ class Cue {
           x: window.innerWidth / 2 + position.x,
           y: window.innerHeight / 2 + position.y,
         });
-        this.switchLayer();
       }
     };
 
@@ -267,8 +200,8 @@ class Cue {
     this.drawHitArea = function () {
       push();
       translate(
-        body.position.x + cos(deg) * (length / 2 + hitSupportRange / 2),
-        body.position.y + sin(deg) * (length / 2 + hitSupportRange / 2)
+        position.x + cos(deg) * (length / 2 + hitSupportRange / 2),
+        position.y + sin(deg) * (length / 2 + hitSupportRange / 2)
       );
       noStroke();
       fill(255, 0, 0, 75);
