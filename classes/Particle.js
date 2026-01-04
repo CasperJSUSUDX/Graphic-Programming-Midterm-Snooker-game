@@ -1,4 +1,15 @@
+/**
+ * Class relative to visual particle
+ * Used for all visual effects: Comet trails, Sparks, and Sink animations.
+ */
 class Particle {
+  /**
+   * @param {2D Vector} _position - Particle position
+   * @param {Number} _size - Particle size
+   * @param {String} _color - Hex color code
+   * @param {Number} _existTime - Lifecycle duration in ms
+   * @param {Object} options - Has two options: {function} positionCallback and {boolean} isFade (optional)
+   */
   constructor(_position, _size, _color, _existTime, options = {}) {
     var position = { ..._position };
     var size = _size;
@@ -22,6 +33,10 @@ class Particle {
       pop();
     };
 
+    /**
+     * Recursive function to shrink the particle over time
+     * @param {Number} rate - Decrase rate in each iterate
+     */
     const fade = function (rate) {
       if (size <= 0.5) {
         const index = Particle.#particles.indexOf(self);
@@ -35,7 +50,7 @@ class Particle {
       }, 0);
     };
 
-    // auto discard;
+    // Auto discard or start fade
     setTimeout(() => {
       if (isFade) {
         fade(0.9);
@@ -46,6 +61,7 @@ class Particle {
     }, existTime);
   }
 
+  // Effect manager
   static #particles = [];
   static #effects = [];
   static #effectMap = new Map([
@@ -53,6 +69,7 @@ class Particle {
     ["sink", this.#ballSinkAnimation],
     ["spark", this.#sparkWhenHit],
   ]);
+
   static drawEffects() {
     for (const e of this.#effects) {
       e.func.apply(this, [...e.args, this.#effects.indexOf(e)]);
@@ -73,13 +90,12 @@ class Particle {
     }
   }
 
+  // Effects
   /**
-   *
-   * @param {Ball} target This effect will apply on what target
-   * @param {Int} index the index in effects
+   * Generates a trail behind a moving ball
+   * Creates 3 particles: 2 faint on sides, 1 distinct in center
    */
   static #cometTrail(target, index) {
-    // discard if target stop
     if (target.body.speed <= 0.1) {
       this.#effects.splice(index, 1);
     }
@@ -87,13 +103,23 @@ class Particle {
     const size = target.size / 4;
     const existTime = 1000;
     const direction = Vector.normalise(target.body.velocity);
+
+    // Calculate side positions
     const left = Vector.mult(Vector.rotate(direction, PI / 2), size / 2);
     const right = Vector.neg(left);
     const centerPosition = { ...target.body.position };
+
+    /**
+     * Helper function: Get closer to center 1 px
+     * @param {2D Vector} position - Original position of the particle
+     * @returns {2D Vector} - A new position
+     */
     function getCloseToCenter(position) {
       const direction = Vector.sub(position, centerPosition);
       return Vector.sub(position, Vector.normalise(direction));
     }
+
+    // Push particles
     this.#particles.push(
       new Particle(
         Vector.add(centerPosition, left),
@@ -125,6 +151,9 @@ class Particle {
     );
   }
 
+  /**
+   * Generates a burst of particles when cue hits the ball.
+   */
   static #sparkWhenHit(target, index) {
     const size = 5;
     const interval = 3;
@@ -170,6 +199,9 @@ class Particle {
     this.#effects.splice(index, 1);
   }
 
+  /**
+   * Replaces the physical ball with a fading particle to simulate entering the pocket.
+   */
   static #ballSinkAnimation(target, index) {
     const position = {
       x: target.body.position.x,
