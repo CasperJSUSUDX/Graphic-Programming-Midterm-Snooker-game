@@ -1,3 +1,33 @@
+/**
+ * Application Design and Interaction:
+ * The core design philosophy behind my snooker game was simulating realistic physics and providing precise user control.
+ * I implemented a hybrid input system using both keyboard and mouse to interact with the game.
+ * The WASD keys control the physical position of the cue stick. The Mouse is dedicated to the aiming and the shooting power.
+ * This separation simulates the real-world behavior that player can move and aim at the same time.
+ * To execute a shot, the user presses space to lock the movement then clicks and drags to pull back the cue, visualizing the power via a dynamic Charge Bar on the left side of the game.
+ * Furthermore, I implemented the real snooker rule inside my game.
+ * So, each turn player can choose the target color at the top-right.
+ * And at the start of the game, player needs to select the starting position inside D-zone using mouse and space.
+ * Technical Implementation:
+ * The project follows Object-Oriented Programming principles.
+ * I separated the logic into different classes, and each class processed relevant logic. 
+ * or example, “Ball” has a constructor to create multiple balls, and it also includes several static functions to deal with logic which related to a group of balls.
+ * The other example is “Rule”. In this class, it provides a series of foul responses.
+ * Hence, no matter how other functions call the foul, they do not need to care about the detail.
+ * And every time I want to change the processing method, I do not need to change the thing multiple times and prevent human error.
+ * Visualization:
+ * Cue ball has a comet effect that generates fading particles behind moving balls to visualize velocity.
+ * Cue impacts some spark effect when hitting a ball.
+ * When a ball is potted, the physical body is removed, and a sink particle effect is triggered to animate the ball shrinking and fading into the pocket.
+ * Extension Crazy Pinball Mode:
+ * For the extension, I developed a Crazy Pinball mode (Mode 4).
+ * In this mode, the table is added high-restitution Bumpers randomly generated in the center of the play area.
+ * This extension transforms the strategic landscape of Snooker.
+ * The bumpers have a restitution value of 2.0, causing balls to accelerate upon impact rather than lose energy.
+ * This mode will create a chaotic environment and looks like a pinball game where players must calculate complex rebounds to avoid or use those obstacles.
+ * Implementing this required dynamic modification of the “Composite” world to add and remove static bodies seamlessly when switching modes.
+ * I also included an interactive Tutorial mode to guide new player through these controls.
+ */
 const SCENE = 0b0001;
 const tableLength = window.innerWidth * 0.6;
 const tableWidth = tableLength / 2;
