@@ -89,6 +89,39 @@ class Tutorial {
         overlay: () => {},
       },
       {
+        title: "D Zone Placement",
+        text: "Click space to place cue ball at the mouse's position.\nIf outside the D-zone, game will put the nearest position in the D-zone",
+        overlay: () => {
+          // draw the D semicircle and a ghost cue ball
+          const cx = window.innerWidth / 2 - tableLength * 0.3;
+          const cy = window.innerHeight / 2;
+          const r = tableWidth / 6;
+          push();
+          // outline
+          noFill();
+          stroke(255, 220, 0);
+          strokeWeight(3);
+          arc(cx, cy, r * 2, r * 2, PI / 2, (PI * 3) / 2);
+          line(cx, cy - r, cx, cy + r);
+
+          // translucent fill to highlight the D
+          noStroke();
+          fill(255, 220, 0, 60);
+          arc(cx, cy, r * 2, r * 2, PI / 2, PI * 3 / 2);
+
+          // a ghost cue ball to indicate placement
+          fill(255, 255, 255, 220);
+          noStroke();
+          ellipse(cx - r * 0.3, cy, ballSize);
+
+          // label
+          fill(255, 220, 0);
+          textAlign(CENTER, BOTTOM);
+          text("D Zone — place cue ball here", cx, cy - r - 10);
+          pop();
+        },
+      },
+      {
         title: "End",
         text: "That's it — good luck! Press T anytime to toggle this tutorial.",
         overlay: () => {},
