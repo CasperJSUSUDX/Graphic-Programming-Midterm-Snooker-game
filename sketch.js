@@ -28,10 +28,16 @@
  * Implementing this required dynamic modification of the “Composite” world to add and remove static bodies seamlessly when switching modes.
  * I also included an interactive Tutorial mode to guide new player through these controls.
  */
+
+// Bitmask for collision filter
 const SCENE = 0b0001;
+
+// Table dimensions based on window size
 const tableLength = window.innerWidth * 0.6;
 const tableWidth = tableLength / 2;
 const ballSize = tableWidth / 36;
+
+// Matter,js modules
 const {
   Engine,
   Body,
@@ -44,6 +50,7 @@ const {
   Vector,
 } = Matter;
 
+// Global variables
 var engine;
 var world;
 var scene;
@@ -56,20 +63,21 @@ function setup() {
   background(255);
   rectMode(CENTER);
 
-  // physic engine initial
+  // Initialize Matter.js engine
   engine = Engine.create({
     enableCCD: true,
     positionIterations: 20,
     velocityIterations: 12,
   });
   world = engine.world;
-  // disable gravity
+  // Disable gravity
   engine.gravity.y = 0;
 
+  // Initialize Game object
+  // create balls
   Ball.initBalls();
-  // Ball.initBalls("debug");
 
-  // bodies initial
+  // Create table
   scene = new Scene(
     tableLength,
     tableWidth,
@@ -78,6 +86,8 @@ function setup() {
     "#2A6137",
     "#784315"
   );
+
+  // Create cue
   cue = new Cue(
     { x: 0, y: -tableWidth / 4 },
     (tableWidth * 5) / 6,
@@ -88,33 +98,37 @@ function setup() {
     ballSize / 2
   );
 
-  // translate the world to the center of user window
+  // Center the physics world to center of table(render)
   Composite.translate(world, {
     x: window.innerWidth / 2,
     y: window.innerHeight / 2,
   });
 
+  // Initialize UI
   UI.createUIContainer();
   UI.createMoveSensetiveSlider(cue);
   UI.createScoreText();
   UI.createProgressText();
 
-  // tutorial
+  // Initialize UI
   tutorial = new Tutorial();
   tutorial.start();
 }
 
 function draw() {
-  // update physic engine
+  // Update physic engine
   Engine.update(engine, 1000 / 60);
 
   background(255);
 
+  // Render static elements
   scene.draw();
   Scene.drawBumper();
 
+  // Render visual effect
   Particle.drawEffects();
 
+  // Render Dynamic elements
   for (const ball of Ball.balls) {
     ball.draw();
   }
@@ -123,18 +137,23 @@ function draw() {
   cue.move();
   cue.rotate();
 
+  // Scene logic check
   scene.sinkCheck();
 
+  // UI overlay
   UI.drawSelectBallArea(Rule.redWasPotted);
   UI.drawChargeBar();
 
+  // Rule process
   if (Rule.turnProcessing) Rule.turnProcess();
 
+  // Tutorial overlay
   tutorial.draw();
 }
 
 function mousePressed() {
   if (tutorial.active) {
+    // If in tutorial mode, not process other logic
     if (tutorial.mousePressed()) return;
   }
 
@@ -158,51 +177,38 @@ async function mouseReleased() {
 }
 
 function keyPressed() {
-  // 1
-  if (keyCode === 49) {
+  /**
+   * Helper function: Swtich to a mode
+   * @param {Number} newMode - Change mode number
+   */
+  function switchMode(newMode) {
     if (!tutorial.active) {
-      UI.pushProgressSpan("Switch to mode 1");
-      mode = 1;
-      Scene.removeBumpers();
-      Ball.resetBalls();
-    }
-  }
-  // 2
-  if (keyCode === 50) {
-    if (!tutorial.active) {
-      UI.pushProgressSpan("Switch to mode 2");
-      mode = 2;
-      Scene.removeBumpers();
-      Ball.resetBalls();
-    }
-  }
-  // 3
-  if (keyCode === 51) {
-    if (!tutorial.active) {
-      UI.pushProgressSpan("Switch to mode 3");
-      mode = 3;
-      Scene.removeBumpers();
-      Ball.resetBalls();
-    }
-  }
-  // 4
-  if (keyCode === 52) {
-    if (!tutorial.active) {
-      UI.pushProgressSpan("Switch to mode 4");
-      mode = 4;
+      UI.pushProgressSpan(`Switch to mode ${newMode}`);
+      mode = newMode;
       Scene.removeBumpers();
       Ball.resetBalls();
     }
   }
 
+  // 1-4
+  if (keyCode === 49) switchMode(1); // Standard
+  if (keyCode === 50) switchMode(2); // Random Reds
+  if (keyCode === 51) switchMode(3); // Practice Cross
+  if (keyCode === 52) switchMode(4); // Crazy Pinball
+
   // space
   if (keyCode === 32) {
     if (!tutorial.active) {
+      // Placing Cue Ball (D-Zone)
       if (Rule.needSelectCueBallPos)
         Rule.needSelectCueBallPos = !Ball.selectPosInDZone(Ball.balls[0]);
+      // Must select color first (Rule enforcement)
       else if (Rule.redWasPotted && Rule.selectedColor === null)
         UI.pushProgressSpan("Please select target color", "#ff0000");
+      // Lock/Unlock Cue movement
       else cue.switchMode();
+
+      // Reset cue if pressed during push
       cue.interruptPush();
     }
   }
