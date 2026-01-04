@@ -1,3 +1,7 @@
+/**
+ * Static class relative with all User Interface elements.
+ * Manage DOM elements and Canvas-drawn UI
+ */
 class UI {
   static createUIContainer() {
     const UIcontainer = createDiv();
@@ -7,6 +11,10 @@ class UI {
     UIcontainer.style("flex-direction", "column");
   }
 
+  /**
+   * Create a slider to adjust cue movement sensitivity
+   * @param {Cue} cue - Reference to cue object
+   */
   static createMoveSensetiveSlider(cue) {
     const container = createDiv();
     container.id("ui-move");
@@ -26,6 +34,7 @@ class UI {
     currentSensetiveText.class("ui-slider-val");
     currentSensetiveText.parent(container);
 
+    // Eventlistener
     moveSlider.input(() => {
       currentSensetiveText.html(moveSlider.value());
       cue.adjustSpeed(moveSlider.value());
@@ -33,6 +42,7 @@ class UI {
   }
 
   static #score = 0;
+
   static createScoreText() {
     const container = createDiv();
     container.id("ui-score");
@@ -60,6 +70,7 @@ class UI {
   }
 
   static #updateList = [];
+
   static async createProgressText() {
     const container = createDiv();
     container.id("ui-progress");
@@ -115,6 +126,7 @@ class UI {
       }
     }, updateInterval);
   }
+
   static changeStageSpan(stage) {
     const span = select("#stage-text");
     switch (stage) {
@@ -132,6 +144,7 @@ class UI {
         break;
     }
   }
+
   static async pushProgressSpan(message, color = "#000000", time = 2000) {
     this.#updateList.push({
       message: message,
@@ -157,6 +170,7 @@ class UI {
     var index = 1;
     this.colorMap.forEach((value, key) => {
       var hexColor = key;
+      // Add alpha when non-selected
       if (!value) hexColor += "40";
 
       fill(hexColor);
@@ -169,7 +183,9 @@ class UI {
     });
     pop();
   }
+
   static resetColorMap() {
+    // Logic to auto-select next legal color based on Stage
     switch (Rule.stage) {
       case 2:
         if (Ball.balls.length >= 2) {
@@ -184,6 +200,7 @@ class UI {
         }
 
         break;
+
       default:
         this.colorMap.forEach((_, key) => {
           if (!Rule.redWasPotted) {
@@ -197,6 +214,7 @@ class UI {
         break;
     }
   }
+
   static selectColorBall() {
     if (!Rule.selectedColor) {
       var selected = false;
@@ -222,15 +240,21 @@ class UI {
     }
   }
 
+  // Charge Bar UI
   static #maxWidth = window.innerWidth / 75;
   static #minWidth = window.innerWidth / 125;
   static #height = window.innerHeight / 3;
   static #interval = 9;
   static #barHeight = this.#height / 2;
+
+  /**
+   * Draws the power charge bar on the left side.
+   * Changes color from Green to Red based on power.
+   */
   static drawChargeBar() {
     push();
     translate(this.#maxWidth + this.#minWidth, window.innerHeight / 2);
-    // edges
+    // Edges
     stroke(0);
     fill(100);
     beginShape();
@@ -239,7 +263,8 @@ class UI {
     vertex(this.#minWidth / 2, this.#height / 2);
     vertex(-this.#minWidth / 2, this.#height / 2);
     endShape();
-    // bar
+
+    // Dynamic bar
     const l = map(
       this.#barHeight,
       -this.#height / 2,
@@ -247,6 +272,7 @@ class UI {
       this.#maxWidth / 2,
       this.#minWidth / 2
     );
+    // Gradient color
     const colorR = map(
       this.#barHeight,
       this.#height / 2,
@@ -269,7 +295,8 @@ class UI {
     vertex(this.#minWidth / 2, this.#height / 2);
     vertex(-this.#minWidth / 2, this.#height / 2);
     endShape();
-    // lines
+
+    // Scale Lines
     stroke(0);
     fill(0);
     for (let i = 0; i < this.#interval; i++) {
@@ -285,6 +312,7 @@ class UI {
     }
     pop();
   }
+
   static convertForceToChargeBarHeight(currentForce, minForce, maxForce) {
     this.#barHeight = map(
       currentForce,
@@ -294,6 +322,7 @@ class UI {
       -this.#height / 2
     );
   }
+  
   static resetChargeBar() {
     this.#barHeight = this.#height / 2;
   }
