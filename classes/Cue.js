@@ -38,7 +38,7 @@ class Cue {
     var pushing = false;
     var positionLock = false;
     var rotationLock = false;
-    var originalBodyPos;
+    var originalPos;
     var pushStartPos;
     var hitSensor;
 
@@ -90,7 +90,7 @@ class Cue {
         pushing = true;
         rotationLock = true;
         pushStartPos = { x: mouseX, y: mouseY };
-        originalBodyPos = Vector.clone(position);
+        originalPos = Vector.clone(position);
         hitSensor = Bodies.rectangle(
           position.x + cos(deg) * (length / 2 + hitSupportRange / 2),
           position.y + sin(deg) * (length / 2 + hitSupportRange / 2),
@@ -106,10 +106,10 @@ class Cue {
     this.pushProcess = function () {
       if (pushing && positionLock) {
         // reset cue position
-        position = Vector.clone(originalBodyPos);
+        position = Vector.clone(originalPos);
 
         // calulate cue's moving and store cue position
-        originalBodyPos = Vector.clone(position);
+        originalPos = Vector.clone(position);
         const pushEndPos = { x: mouseX, y: mouseY };
         const moveLength = min(
           300,
@@ -130,11 +130,11 @@ class Cue {
           const step = () => {
             if (
               Vector.magnitude(
-                Vector.sub(Vector.clone(position), originalBodyPos)
+                Vector.sub(Vector.clone(position), originalPos)
               ) <= 50
             ) {
               resolve();
-              position = Vector.clone(originalBodyPos);
+              position = Vector.clone(originalPos);
               return;
             }
 
@@ -157,8 +157,8 @@ class Cue {
 
         const speed = Vector.div(
           {
-            x: originalBodyPos.x - position.x,
-            y: originalBodyPos.y - position.y,
+            x: originalPos.x - position.x,
+            y: originalPos.y - position.y,
           },
           5
         );
@@ -200,7 +200,7 @@ class Cue {
         pushing = false;
         cue.unlock();
         UI.resetChargeBar();
-        position = Vector.clone(originalBodyPos);
+        position = Vector.clone(originalPos);
       }
     };
 
