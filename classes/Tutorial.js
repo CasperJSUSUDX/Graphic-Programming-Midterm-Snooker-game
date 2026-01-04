@@ -66,7 +66,6 @@ class Tutorial {
         title: "Select Target Color",
         text: "Click a color at the top-right to select it (applies in later stages).",
         overlay: () => {
-          const baseX = window.innerWidth;
           const interval = UI.interval;
           const circleSize = UI.circleSize;
           var index = 1;
@@ -135,7 +134,6 @@ class Tutorial {
     fill(0, 150);
     rect(0, 0, window.innerWidth, window.innerHeight);
 
-    // central panel (nudged right and down for better placement)
     const w = min(700, window.innerWidth - 120);
     const h = 180;
     const x = window.innerWidth / 2 - w / 2;
@@ -214,7 +212,6 @@ class Tutorial {
 
     pop();
 
-    // allow current step custom overlays to draw on top
     push();
     this.steps[this.step].overlay();
     pop();
