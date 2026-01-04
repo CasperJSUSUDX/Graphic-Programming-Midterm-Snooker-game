@@ -1,37 +1,22 @@
+/**
+ * Static class managing the game rule and logic
+ * Manage state transitions, score calculation, and foul detection
+ */
 class Rule {
-  // 1 for starting position, 2 for ramdom position(only red balls), 3 for random position(red balls and colors)
+  // Game Modes: 1: Standard, 2: Random Reds, 3: Practice, 4: Crazy Pinball
   static mode = 1;
-  // stage 0: break shoot, stage 1: red and color ball in turn, stage 2: color order
+
+  // Game Stages:
+  // 0: Break shot
+  // 1: Red and Color alternation
+  // 2: Clearing the Colors
   static stage = 0;
+
+  // Flags
   static needSelectCueBallPos = true;
   static redWasPotted = false;
   static previousPotColor = null;
   static selectedColor = "#ff0000";
-
-  static selectColorBall() {
-    if (!this.selectedColor) {
-      var selected = false;
-      var index = 1;
-      for (const [key, _] of UI.colorMap.entries()) {
-        const x =
-          window.innerWidth - (UI.colorMap.size + 1 - index) * UI.interval;
-        const y = UI.interval;
-        if (dist(mouseX, mouseY, x, y) <= UI.circleSize / 2) {
-          this.selectedColor = key;
-          selected = true;
-          break;
-        }
-        index++;
-      }
-
-      if (selected) {
-        UI.colorMap.forEach((_, key) => {
-          if (key === this.selectedColor) UI.colorMap.set(key, true);
-          else UI.colorMap.set(key, false);
-        });
-      }
-    }
-  }
 
   /**
    * Iterate through all the balls and check the speed
@@ -52,29 +37,37 @@ class Rule {
     id: "empty",
     score: 4,
   };
+
   /**
-   * The checking functions when there is a ball hit by the cue
+   * Called every frame while balls are moving
+   * Log the first collision of the cue ball
    */
   static turnProcess() {
     if (this.#firstHit.id === "empty")
       this.#firstHit = Ball.cueBallCollisionCheck();
     Ball.ballCollisionWithWallCheck();
+
+    // Settle the turn when all balls stop
     if (!this.isAnyBallMoving()) this.#turnEnd();
   }
+
   /**
-   * A helper function of turnProcess
-   * Handling the check things after all the ball is stop(speed < 0.01)
+   * Logic executed when the turn ends
+   * Calculates score, checks fouls, and updates game stage
    */
   static #turnEnd() {
-    var inOff = false;
+    var inOff = false; // cue ball potted
     var hitWrongBall = false;
     var pottedOutOfTarget = new Set();
     var foul = false;
     var maxSocre = 0;
-    // foul check
+
+    // Foul check
     if (scene.sinkedMap.has("#ffffff")) inOff = true;
+    // Check first hit match target
     if (!["empty", this.selectedColor, "#ff0000"].includes(this.#firstHit.id))
       hitWrongBall = true;
+    // Check what was potted
     scene.sinkedMap.forEach((value, key) => {
       if (![this.selectedColor, "#ff0000", "#ffffff"].includes(key)) {
         pottedOutOfTarget.add(value);
@@ -82,6 +75,7 @@ class Rule {
       }
     });
 
+    // Determine sepecific foul type
     if (hitWrongBall || pottedOutOfTarget.size > 0) {
       this.hitOrPottedWrongBall(max(this.#firstHit.score, maxSocre));
       foul = true;
@@ -93,14 +87,18 @@ class Rule {
       foul = true;
     }
 
+    // State machine
     switch (this.stage) {
+      // Break shot
       case 0:
+        // Check whether any red ball hit cushion rails
         if (
           foul ||
           (!Ball.checkListWasDecreaseAndClear() &&
             !scene.sinkedMap.get("#ff0000"))
         ) {
-          // reset the entire table
+          // Break failed
+          // Restart game
           UI.resetScore();
           UI.pushProgressSpan("Restart", "#ff0000");
           this.needSelectCueBallPos = true;
@@ -111,6 +109,7 @@ class Rule {
           break;
         }
 
+        // Process potted balls
         scene.sinkedMap.forEach((value, key) => {
           const index = Ball.balls.indexOf(value);
           this.previousPotColor = key;
@@ -122,7 +121,10 @@ class Rule {
         this.stage++;
         UI.changeStageSpan(this.stage);
         break;
+
+      // Reds and Colors
       case 1:
+        // Transistion to stage 2 if no red ball left
         if (
           !Ball.balls.find((ball) => ball.id === "#ff0000") &&
           this.redWasPotted
@@ -134,6 +136,7 @@ class Rule {
         scene.sinkedMap.forEach((value, key) => {
           if (foul) {
             if (key !== "#ff0000") {
+              // color come back when foul
               value.reposition();
             }
           } else {
@@ -144,6 +147,7 @@ class Rule {
             UI.addAndUpdateScore(value.score);
             World.remove(world, value.body);
             Ball.balls.splice(index, 1);
+            value.reposition();
           }
         });
 
@@ -151,6 +155,8 @@ class Rule {
           this.redWasPotted = false;
         }
         break;
+
+      // Clearing the Colors
       case 2:
         scene.sinkedMap.forEach((value) => {
           if (foul) {
@@ -164,13 +170,14 @@ class Rule {
           }
         });
 
+        // Only left cue ball
         if (Ball.balls.length == 1) {
           UI.pushProgressSpan("Game End", "#00ff00", 10000);
         }
         break;
     }
 
-    // Unlock the cue and reset the state
+    // Clean and reset flags
     cue.unlock();
     scene.sinkedMap = new Map();
     this.selectedColor = null;
@@ -188,15 +195,18 @@ class Rule {
     UI.addAndUpdateScore(-max(4, score));
     UI.pushProgressSpan("Foul: Didn't hit cue ball.", "#ff0000");
   }
+
   static pottedCueBall() {
     UI.pushProgressSpan("Foul: Cue ball in pocket.", "#ff0000");
     UI.addAndUpdateScore(-4);
     this.needSelectCueBallPos = true;
   }
+
   static hitOrPottedWrongBall(score) {
     UI.pushProgressSpan("Foul: Hitted or Potted wrong color.", "#ff0000");
     UI.addAndUpdateScore(-max(score, 4));
   }
+  
   static missHit() {
     UI.pushProgressSpan(
       "Foul: Cue ball didn't hit any other balls.",
