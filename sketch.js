@@ -37,7 +37,7 @@ function setup() {
     "#784315"
   );
   cue = new Cue(
-    createVector(0, -tableWidth / 4),
+    { x: 0, y: -tableWidth / 4 },
     (tableWidth * 5) / 6,
     tableWidth * 0.014,
     "#563112",

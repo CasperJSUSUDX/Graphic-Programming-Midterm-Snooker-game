@@ -23,10 +23,11 @@ class Cue {
         mask: SCENE,
       },
     };
-    var position = _initPos.add(
-      createVector(window.innerWidth / 2, window.innerHeight / 2)
-    );
-
+    var position = Vector.add(_initPos, {
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
+    });
+    this.position = Vector.clone(position);
     var deg = 0;
     var length = _length;
     var diameter = _diameter;
@@ -43,7 +44,7 @@ class Cue {
 
     this.draw = function () {
       push();
-      translate(position);
+      translate(position.x, position.y);
       rotate(deg);
       noStroke();
       fill(color);
@@ -51,25 +52,20 @@ class Cue {
       pop();
     };
 
-    this.getP = function () {
-      return position;
-    };
-
     this.move = function () {
       if (keyIsPressed && !positionLock) {
-        var velocity = createVector(0, 0);
+        var velocity = { x: 0, y: 0 };
 
         // W
-        if (keyIsDown(87)) velocity.add(0, -speed);
+        if (keyIsDown(87)) velocity = Vector.add(velocity, { x: 0, y: -speed });
         // A
-        if (keyIsDown(65)) velocity.add(-speed, 0);
+        if (keyIsDown(65)) velocity = Vector.add(velocity, { x: -speed, y: 0 });
         // S
-        if (keyIsDown(83)) velocity.add(0, speed);
+        if (keyIsDown(83)) velocity = Vector.add(velocity, { x: 0, y: speed });
         // D
-        if (keyIsDown(68)) velocity.add(speed, 0);
+        if (keyIsDown(68)) velocity = Vector.add(velocity, { x: speed, y: 0 });
 
-        velocity.normalize().mult(speed);
-        position.add(velocity);
+        position = Vector.add(position, Vector.mult(Vector.normalise(velocity), speed));
       }
     };
 
@@ -93,8 +89,8 @@ class Cue {
       if (!pushing && positionLock) {
         pushing = true;
         rotationLock = true;
-        pushStartPos = createVector(mouseX, mouseY);
-        originalBodyPos = position.copy();
+        pushStartPos = { x: mouseX, y: mouseY };
+        originalBodyPos = Vector.clone(position);
         hitSensor = Bodies.rectangle(
           position.x + cos(deg) * (length / 2 + hitSupportRange / 2),
           position.y + sin(deg) * (length / 2 + hitSupportRange / 2),
@@ -110,15 +106,21 @@ class Cue {
     this.pushProcess = function () {
       if (pushing && positionLock) {
         // reset cue position
-        position = originalBodyPos.copy();
+        position = Vector.clone(originalBodyPos);
 
         // calulate cue's moving and store cue position
-        originalBodyPos = position.copy();
-        const pushEndPos = createVector(mouseX, mouseY);
-        const moveLength = min(300, pushEndPos.sub(pushStartPos).mag());
-        const moveDirection = createVector(cos(deg), sin(deg)).mult(moveLength);
+        originalBodyPos = Vector.clone(position);
+        const pushEndPos = { x: mouseX, y: mouseY };
+        const moveLength = min(
+          300,
+          Vector.magnitude(Vector.sub(pushEndPos, pushStartPos))
+        );
+        const moveDirection = Vector.mult(
+          { x: cos(deg), y: sin(deg) },
+          moveLength
+        );
         UI.convertForceToChargeBarHeight(moveLength, 0, 300);
-        position.sub(moveDirection);
+        position = Vector.sub(position, moveDirection);
       }
     };
 
@@ -126,13 +128,17 @@ class Cue {
       async function cueReposition(direction) {
         return new Promise((resolve) => {
           const step = () => {
-            if (position.copy().sub(originalBodyPos).mag() <= 50) {
+            if (
+              Vector.magnitude(
+                Vector.sub(Vector.clone(position), originalBodyPos)
+              ) <= 50
+            ) {
               resolve();
-              position = originalBodyPos.copy();
+              position = Vector.clone(originalBodyPos);
               return;
             }
 
-            position.add(direction);
+            position = Vector.add(position, direction);
             setTimeout(step, 20);
           };
 
@@ -141,15 +147,21 @@ class Cue {
       }
 
       if (pushing && positionLock) {
-        var pushEndPos = createVector(mouseX, mouseY);
-        var moveLength = min(300, pushEndPos.sub(pushStartPos).mag());
+        const pushEndPos = { x: mouseX, y: mouseY };
+        const moveLength = min(
+          300,
+          Vector.magnitude(Vector.sub(pushEndPos, pushStartPos))
+        );
+        const pushForce = map(moveLength, 0, 300, 0, maxPushForce * 10);
         var hitBall = null;
-        var pushForce = map(moveLength, 0, 300, 0, maxPushForce * 10);
 
-        const speed = createVector(
-          originalBodyPos.x - position.x,
-          originalBodyPos.y - position.y
-        ).div(5);
+        const speed = Vector.div(
+          {
+            x: originalBodyPos.x - position.x,
+            y: originalBodyPos.y - position.y,
+          },
+          5
+        );
         await cueReposition(speed);
         for (const ball of Ball.balls) {
           if (Collision.collides(ball.body, hitSensor)) {
@@ -188,11 +200,7 @@ class Cue {
         pushing = false;
         cue.unlock();
         UI.resetChargeBar();
-        position = originalBodyPos.copy();
-        Body.setPosition(collisionSensor, {
-          x: window.innerWidth / 2 + position.x,
-          y: window.innerHeight / 2 + position.y,
-        });
+        position = Vector.clone(originalBodyPos);
       }
     };
 
