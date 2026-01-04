@@ -4,7 +4,7 @@
  */
 class Cue {
   /**
-   * @param {p5.Vector} _initPos - Initial position relative to center of table
+   * @param {2D Vector} _initPos - Initial position relative to center of table
    * @param {Number} _length - Visual length of the cue
    * @param {Number} _diameter - Visual thickness
    * @param {String} _color - Hex color code of the cue
