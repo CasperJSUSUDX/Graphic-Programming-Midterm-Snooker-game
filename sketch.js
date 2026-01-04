@@ -124,41 +124,51 @@ async function mouseReleased() {
 function keyPressed() {
   // 1
   if (keyCode === 49) {
-    UI.pushProgressSpan("Switch to mode 1");
-    mode = 1;
-    Scene.removeBumpers();
-    Ball.resetBalls();
+    if (!tutorial.active) {
+      UI.pushProgressSpan("Switch to mode 1");
+      mode = 1;
+      Scene.removeBumpers();
+      Ball.resetBalls();
+    }
   }
   // 2
   if (keyCode === 50) {
-    UI.pushProgressSpan("Switch to mode 2");
-    mode = 2;
-    Scene.removeBumpers();
-    Ball.resetBalls();
+    if (!tutorial.active) {
+      UI.pushProgressSpan("Switch to mode 2");
+      mode = 2;
+      Scene.removeBumpers();
+      Ball.resetBalls();
+    }
   }
   // 3
   if (keyCode === 51) {
-    UI.pushProgressSpan("Switch to mode 3");
-    mode = 3;
-    Scene.removeBumpers();
-    Ball.resetBalls();
+    if (!tutorial.active) {
+      UI.pushProgressSpan("Switch to mode 3");
+      mode = 3;
+      Scene.removeBumpers();
+      Ball.resetBalls();
+    }
   }
   // 4
   if (keyCode === 52) {
-    UI.pushProgressSpan("Switch to mode 4");
-    mode = 4;
-    Scene.removeBumpers();
-    Ball.resetBalls();
+    if (!tutorial.active) {
+      UI.pushProgressSpan("Switch to mode 4");
+      mode = 4;
+      Scene.removeBumpers();
+      Ball.resetBalls();
+    }
   }
 
   // space
   if (keyCode === 32) {
-    if (Rule.needSelectCueBallPos)
-      Rule.needSelectCueBallPos = !Ball.selectPosInDZone(Ball.balls[0]);
-    else if (Rule.redWasPotted && Rule.selectedColor === null)
-      UI.pushProgressSpan("Please select target color", "#ff0000");
-    else cue.switchMode();
-    cue.interruptPush();
+    if (!tutorial.active) {
+      if (Rule.needSelectCueBallPos)
+        Rule.needSelectCueBallPos = !Ball.selectPosInDZone(Ball.balls[0]);
+      else if (Rule.redWasPotted && Rule.selectedColor === null)
+        UI.pushProgressSpan("Please select target color", "#ff0000");
+      else cue.switchMode();
+      cue.interruptPush();
+    }
   }
 
   // t
