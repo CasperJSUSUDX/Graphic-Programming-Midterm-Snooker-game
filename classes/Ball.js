@@ -1,5 +1,16 @@
+/**
+ * Class is releated with snooker balls
+ * Manages the physics body, render, and static logics
+ */
 class Ball {
-  constructor(defaultPosition, color, _score = 1, _size = ballSize) {
+  /**
+   * Create a ball
+   * @param {2D Vector} _initPosition - the initial position of the ball
+   * @param {string} color - Hex color code
+   * @param {Number} _score - the score of the ball, default value is 1
+   * @param {Number} _size - Diameter of the ball(Optional)
+   */
+  constructor(_initPosition, color, _score = 1, _size = ballSize) {
     const ballOptions = {
       ccd: true,
       density: 0.04,
@@ -12,19 +23,26 @@ class Ball {
         mask: SCENE,
       },
     };
+    // public variables
     this.visiable = true;
+    // use hex color code as id
     this.id = color;
     this.score = _score;
+    this.size = _size;
+    this.initPosition = { ..._initPosition };
+
+    // create Matter.js body
     this.body = Bodies.circle(
-      defaultPosition.x,
-      defaultPosition.y,
+      _initPosition.x,
+      _initPosition.y,
       _size / 2,
       ballOptions
     );
-    this.size = _size;
-    this.initPosition = { ...defaultPosition };
     World.add(world, this.body);
 
+    /**
+     * Render the ball
+     */
     this.draw = function () {
       if (this.visiable) {
         push();
@@ -38,6 +56,9 @@ class Ball {
       }
     };
 
+    /**
+     * Reset the ball to its initial position and stop it
+     */
     this.reposition = function () {
       this.visiable = true;
       Body.setPosition(this.body, this.initPosition);
@@ -45,11 +66,17 @@ class Ball {
         x: window.innerWidth / 2,
         y: window.innerHeight / 2,
       });
+      // ensure the ball is solid
       Body.set(this.body, "isSensor", false);
     };
   }
 
   static balls = [];
+
+  /**
+   * Check whether the moving cue ball has collided with another ball
+   * @returns {Object} - A object containing id and score
+   */
   static cueBallCollisionCheck() {
     if (this.balls[0].body.speed > 0.01) {
       for (let i = 1; i < this.balls.length; i++) {
@@ -67,7 +94,8 @@ class Ball {
     };
   }
   /**
-   * Remove and initialize all the ball
+   * Remove all balls from this.balls and clear this.balls
+   * Then initialize balls based on current mode
    */
   static resetBalls() {
     World.remove(
@@ -77,6 +105,7 @@ class Ball {
     Ball.balls = [];
     this.initBalls(mode);
     UI.resetScore();
+
     for (const ball of this.balls) {
       Body.translate(ball.body, {
         x: window.innerWidth / 2,
@@ -85,8 +114,15 @@ class Ball {
     }
   }
 
+  // checking list of ballCollisionWithWallCheck
   static #checkList = [];
   static #startLength;
+
+  /**
+   * Iterates through the checkList
+   * And check whether the element has collided with a body that label with "Wall"
+   * If has collided, remove the element from checkList
+   */
   static ballCollisionWithWallCheck() {
     if (this.#checkList.length === 0) return;
 
@@ -94,7 +130,7 @@ class Ball {
       let collided = false;
 
       for (const body of world.bodies) {
-        // check the body is compiste or not
+        // Handle compound bodies
         if (body.parts.length > 1) {
           for (const part of body.parts) {
             if (part.label == "Wall") {
@@ -105,6 +141,7 @@ class Ball {
             }
           }
         }
+        // Handle simple bodies
         if (body.label === "Wall") {
           if (Collision.collides(this.#checkList[i].body, body)) {
             collided = true;
@@ -119,10 +156,19 @@ class Ball {
       }
     }
   }
+  /**
+   * Push the passing array into checkList and initialize the startLength
+   * @param {object[]} arr - the object needs to have Matter.js body property
+   */
   static registerCheckList(arr) {
     this.#checkList = [...arr];
     this.#startLength = this.#checkList.length;
   }
+  /**
+   * Check whether the checklist change
+   * Then clear the checkList
+   * @returns {Boolean} - Whether the length of checklist change
+   */
   static checkListWasDecreaseAndClear() {
     const l = this.#checkList.length;
     this.#checkList = [];
@@ -130,14 +176,20 @@ class Ball {
     return false;
   }
 
+  /**
+   * Calculates valid coordinates for placing the cue ball within the D-Zone.
+   * @param {Ball} cueBall - The cue ball object to be placed.
+   * @returns {Boolean} - Whether the placement is valid or not
+   */
   static selectPosInDZone(cueBall) {
-    const vector = {
-      x: 0,
-      y: 0,
-    };
+    const vector = { x: 0, y: 0 };
+
+    // Define the horizontal boundaries
     const rightLimit = window.innerWidth / 2 - tableLength * 0.3;
     const leftLimit =
       window.innerWidth / 2 - tableLength * 0.3 - tableWidth / 6;
+
+    // Calculate x position
     vector.x = -tableLength * 0.35;
     if (mouseX >= rightLimit) {
       vector.x = rightLimit;
@@ -147,12 +199,19 @@ class Ball {
       vector.x = mouseX;
     }
 
-    const l_square = (tableWidth / 6) ** 2 - (rightLimit - vector.x) ** 2;
+    // Calculate vertical boundaries
+    const radius = tableWidth / 6;
+    const distFromCenter = rightLimit - vector.x;
+    const l_square = radius ** 2 - distFromCenter ** 2;
+
     var l;
     if (l_square <= 0.001) l = tableWidth / 6;
     else l = Math.sqrt((tableWidth / 6) ** 2 - (rightLimit - vector.x) ** 2);
+
     const topLimit = window.innerHeight / 2 - l;
     const bottomLimit = window.innerHeight / 2 + l;
+
+    // Calculate y position
     vector.y = 0;
     if (mouseY <= topLimit) {
       vector.y = topLimit;
@@ -162,10 +221,12 @@ class Ball {
       vector.y = mouseY;
     }
 
-    // check whether the ball will collide with other ball or not
-    // if collide then fail to select and return false
+    // Collision check
+    // Ensure the place is valid
+    // Create a temporary sensor
     Body.set(cueBall.body, "isSensor", true);
     Body.setPosition(cueBall.body, vector);
+
     for (let i = 1; i < this.balls.length; i++) {
       if (Collision.collides(cueBall.body, this.balls[i].body)) {
         UI.pushProgressSpan("Cannot put cue ball at there.", "#ff0000");
@@ -178,32 +239,31 @@ class Ball {
     return true;
   }
 
+  /**
+   * Initializes the table setup based on mode
+   * @param {Number} mode - 1: Standard, 2: Random red balls, 3: Practice Cross, 4: Crasy Pinball
+   */
   static initBalls(mode = 1) {
     switch (mode) {
+      // standard mode
       case 1:
-        // cue ball
+        // Add cue ball and colors
         this.balls.push(new Ball({ x: -tableLength * 0.35, y: 0 }, "#ffffff"));
-        // yellow ball
         this.balls.push(
           new Ball({ x: -tableLength * 0.3, y: tableWidth / 6 }, "#ffff00", 2)
         );
-        // browen ball
         this.balls.push(
           new Ball({ x: -tableLength * 0.3, y: 0 }, "#784315", 4)
         );
-        // green ball
         this.balls.push(
           new Ball({ x: -tableLength * 0.3, y: -tableWidth / 6 }, "#00ff00", 3)
         );
-        // blue ball
         this.balls.push(new Ball({ x: 0, y: 0 }, "#0000ff", 5));
-        // pink
         this.balls.push(new Ball({ x: tableLength / 4, y: 0 }, "#EF88BE", 6));
-        // black ball
         this.balls.push(
           new Ball({ x: (tableLength * 9) / 22, y: 0 }, "#000000", 7)
         );
-        // red balls
+        // Triangle formation for Reds
         for (let i = 0; i < 5; i++) {
           var basicPosY = (ballSize / 2) * i;
           for (let j = 0; j <= i; j++) {
@@ -219,58 +279,48 @@ class Ball {
           }
         }
         break;
+      // Random red balls
       case 2:
-        // cue ball
+        // Add cue ball and colors
         this.balls.push(new Ball({ x: -tableLength * 0.35, y: 0 }, "#ffffff"));
-        // yellow ball
         this.balls.push(
           new Ball({ x: -tableLength * 0.3, y: tableWidth / 6 }, "#ffff00", 2)
         );
-        // browen ball
         this.balls.push(
           new Ball({ x: -tableLength * 0.3, y: 0 }, "#784315", 4)
         );
-        // green ball
         this.balls.push(
           new Ball({ x: -tableLength * 0.3, y: -tableWidth / 6 }, "#00ff00", 3)
         );
-        // blue ball
         this.balls.push(new Ball({ x: 0, y: 0 }, "#0000ff", 5));
-        // pink
         this.balls.push(new Ball({ x: tableLength / 4, y: 0 }, "#EF88BE", 6));
-        // black ball
         this.balls.push(
           new Ball({ x: (tableLength * 9) / 22, y: 0 }, "#000000", 7)
         );
-        // red balls
+        // Generate 15 reds at random positions
         for (let i = 0; i < 15; i++) {
           this.balls.push(new Ball(this.#generatePosition(), "#ff0000"));
         }
         break;
+      // Practice Mode
       case 3:
-        // cue ball
+        // Add cue ball and colors
         this.balls.push(new Ball({ x: -tableLength * 0.35, y: 0 }, "#ffffff"));
-        // yellow ball
         this.balls.push(
           new Ball({ x: -tableLength * 0.3, y: tableWidth / 6 }, "#ffff00", 2)
         );
-        // browen ball
         this.balls.push(
           new Ball({ x: -tableLength * 0.3, y: 0 }, "#784315", 4)
         );
-        // green ball
         this.balls.push(
           new Ball({ x: -tableLength * 0.3, y: -tableWidth / 6 }, "#00ff00", 3)
         );
-        // blue ball
         this.balls.push(new Ball({ x: 0, y: 0 }, "#0000ff", 5));
-        // pink
         this.balls.push(new Ball({ x: tableLength / 4, y: 0 }, "#EF88BE", 6));
-        // black ball
         this.balls.push(
           new Ball({ x: (tableLength * 9) / 22, y: 0 }, "#000000", 7)
         );
-        // red balls
+        // Cross formation
         const xInterval = (tableLength * 7) / 264;
         const yInterval = tableWidth / 12;
         for (let i = 0; i < 5; i++) {
@@ -291,30 +341,24 @@ class Ball {
           );
         }
         break;
+      // Crazy Pinball Mode
       case 4:
-        // cue ball
+        // Setup similar to Mode 1 but includes Bumper creation
         this.balls.push(new Ball({ x: -tableLength * 0.35, y: 0 }, "#ffffff"));
-        // yellow ball
         this.balls.push(
           new Ball({ x: -tableLength * 0.3, y: tableWidth / 6 }, "#ffff00", 2)
         );
-        // browen ball
         this.balls.push(
           new Ball({ x: -tableLength * 0.3, y: 0 }, "#784315", 4)
         );
-        // green ball
         this.balls.push(
           new Ball({ x: -tableLength * 0.3, y: -tableWidth / 6 }, "#00ff00", 3)
         );
-        // blue ball
         this.balls.push(new Ball({ x: 0, y: 0 }, "#0000ff", 5));
-        // pink
         this.balls.push(new Ball({ x: tableLength / 4, y: 0 }, "#EF88BE", 6));
-        // black ball
         this.balls.push(
           new Ball({ x: (tableLength * 9) / 22, y: 0 }, "#000000", 7)
         );
-        // red balls
         for (let i = 0; i < 5; i++) {
           var basicPosY = (ballSize / 2) * i;
           for (let j = 0; j <= i; j++) {
@@ -330,6 +374,7 @@ class Ball {
           }
         }
 
+        // Add bumpers
         Scene.createBumper(5);
         break;
     }
@@ -338,7 +383,7 @@ class Ball {
   /**
    * Generate a random position inside the table
    * If there exist a ball at the position, call itself until success
-   * @returns {2D Vector} a position
+   * @returns {2D Vector} - a 2d vector {x, y}
    */
   static #generatePosition() {
     const position = {
