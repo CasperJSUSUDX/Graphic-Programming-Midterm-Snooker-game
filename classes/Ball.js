@@ -94,6 +94,17 @@ class Ball {
       let collided = false;
 
       for (const body of world.bodies) {
+        // check the body is compiste or not
+        if (body.parts.length > 1) {
+          for (const part of body.parts) {
+            if (part.label == "Wall") {
+              if (Collision.collides(this.#checkList[i].body, body)) {
+                collided = true;
+                break;
+              }
+            }
+          }
+        }
         if (body.label === "Wall") {
           if (Collision.collides(this.#checkList[i].body, body)) {
             collided = true;
