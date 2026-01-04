@@ -171,7 +171,6 @@ class Particle {
   }
 
   static #ballSinkAnimation(target, index) {
-    console.log("SINK");
     const position = {
       x: target.body.position.x,
       y: target.body.position.y,

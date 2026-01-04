@@ -203,19 +203,5 @@ class Cue {
         position = Vector.clone(originalPos);
       }
     };
-
-    // debug use
-    this.drawHitArea = function () {
-      push();
-      translate(
-        position.x + cos(deg) * (length / 2 + hitSupportRange / 2),
-        position.y + sin(deg) * (length / 2 + hitSupportRange / 2)
-      );
-      noStroke();
-      fill(255, 0, 0, 75);
-      rotate(deg);
-      rect(0, 0, hitSupportRange);
-      pop();
-    };
   }
 }

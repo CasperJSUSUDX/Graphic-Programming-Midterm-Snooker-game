@@ -49,7 +49,6 @@ var world;
 var scene;
 var cue;
 var tutorial;
-var debugMode = true;
 
 function setup() {
   createCanvas(window.innerWidth, window.innerHeight);
@@ -131,12 +130,6 @@ function draw() {
 
   if (Rule.turnProcessing) Rule.turnProcess();
 
-  if (debugMode) {
-    drawMousePos();
-    cue.drawHitArea();
-  }
-
-  // tutorial draw
   tutorial.draw();
 }
 

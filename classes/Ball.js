@@ -179,7 +179,6 @@ class Ball {
   }
 
   static initBalls(mode = 1) {
-    // TODO: Add a user tutorial level
     switch (mode) {
       case 1:
         // cue ball
@@ -332,26 +331,6 @@ class Ball {
         }
 
         Scene.createBumper(5);
-        break;
-      case "debug":
-        this.balls.push(new Ball({ x: 0, y: tableWidth / 2 - 100 }, "#ffffff"));
-        this.balls.push(new Ball({ x: 0, y: tableWidth / 2 - 50 }, "#ff0000"));
-        this.balls.push(
-          new Ball(
-            { x: tableLength / 2 - 50, y: -tableWidth / 2 + 50 },
-            "#0000ff",
-            5
-          )
-        );
-        this.balls.push(
-          new Ball(
-            { x: tableLength / 2 - 50, y: tableWidth / 2 - 50 },
-            "#000000",
-            7
-          )
-        );
-        Rule.needSelectCueBallPos = false;
-        Rule.stage = 1;
         break;
     }
   }
