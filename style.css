@@ -7,3 +7,102 @@ canvas {
   vertical-align: top;
   color: #0000ff;
 }
+
+/* UI panel styles (matches Tutorial panel look) */
+.ui-panel {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  padding: 10px 14px;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #111111;
+}
+
+.ui-panel.small {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 12px;
+}
+
+.ui-text {
+  font-size: 14px;
+}
+
+/* Dimmed state applied when tutorial overlay is active */
+.dimmed {
+  filter: brightness(0.6);
+  opacity: 0.6;
+  transition: filter 200ms ease, opacity 200ms ease;
+  pointer-events: none;
+}
+
+/* UI container positioning and spacing (prevents overlap of children) */
+#ui {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1000;
+}
+
+/* Score badge (now flows in the UI column) */
+#ui-score {
+  position: relative;
+  min-width: 130px;
+}
+
+#ui-score .score-label {
+  font-weight: 600;
+  font-size: 13px;
+  color: #444;
+}
+
+#ui-score .score-value {
+  font-weight: 700;
+  font-size: 20px;
+  color: #1b5fa7;
+  margin-left: 6px;
+}
+
+/* Move sensitivity */
+#ui-move.ui-panel {
+  /* remove extra margin-top so spacing is controlled by #ui gap */
+  margin-top: 0;
+}
+
+.ui-slider-val {
+  background: rgba(0,0,0,0.04);
+  padding: 6px 8px;
+  border-radius: 6px;
+  min-width: 36px;
+  text-align: center;
+}
+
+/* simple slider style (modern look) */
+input[type="range"].ui-slider {
+  height: 6px;
+  background: linear-gradient(90deg, #4eb5ff, #8fd3ff);
+  border-radius: 6px;
+}
+input[type="range"].ui-slider:focus { outline: none; }
+input[type="range"].ui-slider::-webkit-slider-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 3px solid #2b9cff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  cursor: pointer;
+}
+input[type="range"].ui-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 3px solid #2b9cff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  cursor: pointer;
+}

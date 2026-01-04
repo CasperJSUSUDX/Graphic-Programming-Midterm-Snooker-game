@@ -86,7 +86,7 @@ class Tutorial {
       },
       {
         title: "Pocket & Scoring",
-        text: "Pocket balls to score. Remember: potting the cue ball is a foul.",
+        text: "Pocket balls to score.",
         overlay: () => {},
       },
       {
@@ -104,10 +104,18 @@ class Tutorial {
   start() {
     this.active = true;
     this.step = 0;
+    const ui = select("#ui");
+    if (ui) ui.addClass("dimmed");
+    const prog = select("#ui-progress");
+    if (prog) prog.addClass("dimmed");
   }
 
   end() {
     this.active = false;
+    const ui = select("#ui");
+    if (ui) ui.removeClass("dimmed");
+    const prog = select("#ui-progress");
+    if (prog) prog.removeClass("dimmed");
   }
 
   next() {

@@ -10,22 +10,23 @@ class UI {
   static createMoveSensetiveSlider(cue) {
     const container = createDiv();
     container.id("ui-move");
-    container.style("display", "flex");
+    container.class("ui-panel small");
     container.parent("ui");
 
-    const moveSensetiveText = createSpan("Move sensetive: ");
-    moveSensetiveText.class("ui-text");
-    moveSensetiveText.parent("ui-move");
+    const moveLabel = createSpan("Move sensitive");
+    moveLabel.class("ui-text");
+    moveLabel.parent(container);
 
     const moveSlider = createSlider(0, 20, 10);
-    moveSlider.size(200);
-    moveSlider.parent("ui-move");
+    moveSlider.class("ui-slider");
+    moveSlider.size(160);
+    moveSlider.parent(container);
 
     const currentSensetiveText = createSpan(moveSlider.value());
-    currentSensetiveText.class("ui-text");
-    currentSensetiveText.parent("ui-move");
+    currentSensetiveText.class("ui-slider-val");
+    currentSensetiveText.parent(container);
 
-    moveSlider.changed(() => {
+    moveSlider.input(() => {
       currentSensetiveText.html(moveSlider.value());
       cue.adjustSpeed(moveSlider.value());
     });
@@ -33,53 +34,83 @@ class UI {
 
   static #score = 0;
   static createScoreText() {
-    const scoreUI = createSpan(`Score: ${this.#score}`);
-    scoreUI.id("score-text");
-    scoreUI.class("ui-text");
-    scoreUI.parent("ui");
+    const container = createDiv();
+    container.id("ui-score");
+    container.class("ui-panel small");
+    container.parent("ui");
+
+    const label = createSpan("Score");
+    label.class("score-label");
+    label.parent(container);
+
+    const value = createSpan(`${this.#score}`);
+    value.id("score-value");
+    value.class("score-value");
+    value.parent(container);
   }
   static addAndUpdateScore(num) {
     this.#score += num;
-    select("#score-text").html(`Score: ${this.#score}`);
+    const el = select("#score-value");
+    if (el) el.html(`${this.#score}`);
   }
   static resetScore() {
     this.#score = 0;
-    select("#score-text").html(`Score: ${this.#score}`);
+    const el = select("#score-value");
+    if (el) el.html(`${this.#score}`);
   }
 
   static #updateList = [];
   static async createProgressText() {
     const container = createDiv();
+    container.id("ui-progress");
     container.style("display", "flex");
     container.style("flex-direction", "column");
     container.style("position", "absolute");
     container.style("left", `${window.innerWidth / 2 - 200}px`);
     container.style("top", "0");
 
+    // Stage display as a panel
+    const stagePanel = createDiv();
+    stagePanel.class("ui-panel");
+    stagePanel.parent(container);
+
     const stageSpan = createSpan("Stage: 0 - Break shot");
-    stageSpan.style("font-size", "4vh");
+    stageSpan.style("font-size", "3vh");
     stageSpan.class("ui-text");
     stageSpan.id("stage-text");
-    stageSpan.parent(container);
+    stageSpan.parent(stagePanel);
+
+    // Message panel below stage (small)
+    const messagePanel = createDiv();
+    messagePanel.class("ui-panel small");
+    messagePanel.parent(container);
+    // hide when there's no message
+    messagePanel.style("display", "none");
 
     const messageSpan = createSpan("");
     messageSpan.id("ui-message");
-    messageSpan.style("font-size", "3vh");
+    messageSpan.style("font-size", "2.2vh");
     messageSpan.class("ui-text");
-    messageSpan.parent(container);
+    messageSpan.parent(messagePanel);
 
-    // update message span each second
+    // update message span regularly
     const updateInterval = 100;
     setInterval(() => {
       if (this.#updateList[0]) {
+        // ensure panel is visible when there's a message
+        messagePanel.style("display", "inline-flex");
         messageSpan.style("color", this.#updateList[0].color);
         messageSpan.html(this.#updateList[0].message);
         this.#updateList[0].time -= updateInterval;
         if (this.#updateList[0].time <= 0) {
           this.#updateList.splice(0, 1);
-          messageSpan.html("");
-          messageSpan.style("color", "#000000");
-          messageSpan.class("ui-text");
+          // if no more messages, hide panel
+          if (!this.#updateList[0]) {
+            messageSpan.html("");
+            messageSpan.style("color", "#000000");
+            messageSpan.class("ui-text");
+            messagePanel.style("display", "none");
+          }
         }
       }
     }, updateInterval);
