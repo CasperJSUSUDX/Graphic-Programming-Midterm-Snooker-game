@@ -88,11 +88,6 @@ class Tutorial {
         },
       },
       {
-        title: "Pocket & Scoring",
-        text: "Pocket balls to score.",
-        overlay: () => {},
-      },
-      {
         title: "D Zone Placement",
         text: "Click space to place cue ball at the mouse's position.\nIf outside the D-zone, game will put the nearest position in the D-zone",
         overlay: () => {
