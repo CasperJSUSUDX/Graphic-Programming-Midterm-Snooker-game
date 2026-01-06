@@ -17,8 +17,11 @@ class Particle {
     var existTime = _existTime;
     const positionCallback = Object.hasOwn(options, "positionCallback")
       ? options.positionCallback
-      : null;
+      : (position) => position;
     const isFade = Object.hasOwn(options, "isFade") ? options.isFade : false;
+    const fadeRate = Object.hasOwn(options, "fadeRate")
+      ? options.fadeRate
+      : 0.9;
     const self = this;
 
     this.draw = function () {
@@ -46,14 +49,14 @@ class Particle {
 
       size = size * rate;
       setTimeout(() => {
-        fade(rate);
+        fade(fadeRate);
       }, 0);
     };
 
     // Auto discard or start fade
     setTimeout(() => {
       if (isFade) {
-        fade(0.9);
+        fade(fadeRate);
       } else {
         const index = Particle.#particles.indexOf(this);
         Particle.#particles.splice(index, 1);
@@ -203,16 +206,14 @@ class Particle {
    * Replaces the physical ball with a fading particle to simulate entering the pocket.
    */
   static #ballSinkAnimation(target, index) {
-    const position = {
-      x: target.body.position.x,
-      y: target.body.position.y,
-    };
+    const position = { ...target.body.position };
     const size = target.size;
     const color = target.id;
 
     this.#particles.push(
-      new Particle(position, size, color, 1000, {
+      new Particle(position, size, color, 200, {
         isFade: true,
+        fadeRate: 0.95,
       })
     );
 

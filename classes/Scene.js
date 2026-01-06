@@ -281,8 +281,15 @@ class Scene {
             ) <
             ball.size / 2
           ) {
+            // create a snapshot
+            const snapshotBall = {
+              body: { position: {...ball.body.position}},
+              size: ball.size,
+              id: ball.id,
+            }
+
             // Trigger effect
-            if (ball.visiable) Particle.callEffect("sink", [ball]);
+            if (ball.visiable) Particle.callEffect("sink", [snapshotBall]);
 
             // Disable collision and conver to invisiable
             Body.set(ball, "isSensor", true);
