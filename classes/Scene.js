@@ -100,7 +100,7 @@ class Scene {
       },
       {
         x: -railWidth / 2,
-        y: width,
+        y: width / 2,
       },
     ];
 
@@ -115,17 +115,17 @@ class Scene {
       ),
       // top right
       Bodies.fromVertices(
-        -length / 4 - pocketSize / 4,
-        width / 2 + railWidth / 2,
-        verticesForHorizontal,
-        options
-      ),
-      // bottom left
-      Bodies.fromVertices(
         length / 4 + pocketSize / 4,
         -width / 2 - railWidth / 2,
         verticesForHorizontal,
         Object.assign(options, { angle: PI })
+      ),
+      // bottom left
+      Bodies.fromVertices(
+        -length / 4 - pocketSize / 4,
+        width / 2 + railWidth / 2,
+        verticesForHorizontal,
+        options
       ),
       // bottom right
       Bodies.fromVertices(
@@ -353,7 +353,7 @@ class Scene {
    * Ensures generated bumpers do not overlap with balls or other bumpers.
    * @param {2D vector} position - the position of the bumper
    * @param {Number} length - length of the bumper
-   * @returns 
+   * @returns
    */
   static #isBumperPositionVaild(position, length) {
     const offsetPosition = {

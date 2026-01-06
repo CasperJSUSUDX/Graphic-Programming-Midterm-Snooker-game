@@ -10,7 +10,7 @@
  * And at the start of the game, player needs to select the starting position inside D-zone using mouse and space.
  * Technical Implementation:
  * The project follows Object-Oriented Programming principles.
- * I separated the logic into different classes, and each class processed relevant logic. 
+ * I separated the logic into different classes, and each class processed relevant logic.
  * or example, “Ball” has a constructor to create multiple balls, and it also includes several static functions to deal with logic which related to a group of balls.
  * The other example is “Rule”. In this class, it provides a series of foul responses.
  * Hence, no matter how other functions call the foul, they do not need to care about the detail.
@@ -44,9 +44,7 @@ const {
   Bodies,
   World,
   Composite,
-  Runner,
   Collision,
-  Events,
   Vector,
 } = Matter;
 
